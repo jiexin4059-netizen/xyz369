@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公司账目管理系统</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 24px 16px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #444;
+      border-left: 4px solid #667eea;
+      padding-left: 10px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-item .label {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .stat-item .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .stat-item.income .value { color: #27ae60; }
+    .stat-item.expense .value { color: #e74c3c; }
+    .stat-item.balance .value { color: #667eea; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input, select {
+      padding: 10px 12px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: #667eea;
+    }
+
+    .btn-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      padding: 11px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      font-family: inherit;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      flex: 1;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    .btn-danger {
+      background: #fff;
+      color: #e74c3c;
+      border: 1.5px solid #e74c3c;
+    }
+
+    .btn-danger:hover { background: #fdf0ef; }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      background: #fff;
+      color: #e74c3c;
+      border: 1px solid #e0e0e0;
+    }
+
+    .btn-sm:hover {
+      background: #fdf0ef;
+      border-color: #e74c3c;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead th {
+      background: #f7f8fc;
+      padding: 11px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 2px solid #eee;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: #fafbff;
+    }
+
+    .amount-income { color: #27ae60; font-weight: 600; }
+    .amount-expense { color: #e74c3c; font-weight: 600; }
+    .amount-empty { color: #ccc; }
+
+    .category-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      background: #eef0fb;
+      color: #667eea;
+    }
+
+    .empty-tip {
+      text-align: center;
+      padding: 40px 20px;
+      color: #aaa;
+      font-size: 0.95rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full-width { grid-column: 1; }
+      .btn-row { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>公司账目管理系统</h1>
+      <p>记录每一笔收支，数据自动保存在浏览器本地</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat-item income">
+        <div class="label">总收入</div>
+        <div class="value" id="totalIncome">¥0.00</div>
+      </div>
+      <div class="stat-item expense">
+        <div class="label">总支出</div>
+        <div class="value" id="totalExpense">¥0.00</div>
+      </div>
+      <div class="stat-item balance">
+        <div class="label">结余</div>
+        <div class="value" id="balance">¥0.00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>添加账目记录</h2>
+      <form id="recordForm" class="form-grid">
+        <div class="form-group">
+          <label for="date">日期</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+          <label for="category">类别</label>
+          <select id="category" required>
+            <option value="">请选择类别</option>
+            <option value="销售收入">销售收入</option>
+            <option value="服务收入">服务收入</option>
+            <option value="其他收入">其他收入</option>
+            <option value="办公用品">办公用品</option>
+            <option value="人员工资">人员工资</option>
+            <option value="房租水电">房租水电</option>
+            <option value="交通差旅">交通差旅</option>
+            <option value="餐饮招待">餐饮招待</option>
+            <option value="其他支出">其他支出</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label for="summary">摘要</label>
+          <input type="text" id="summary" placeholder="例如：收到客户 A 项目款" required>
+        </div>
+        <div class="form-group">
+          <label for="income">收入（元）</label>
+          <input type="number" id="income" min="0" step="0.01" placeholder="0.00" value="">
+        </div>
+        <div class="form-group">
+          <label for="expense">支出（元）</label>
+          <input type="number" id="expense" min="0" step="0.01" placeholder="0.00" value="">
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn-primary">添加记录</button>
+          <button type="button" class="btn-danger" id="clearAllBtn">清空全部</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>账目明细</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>摘要</th>
+              <th>类别</th>
+              <th>收入</th>
+              <th>支出</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="recordTableBody">
+          </tbody>
+        </table>
+        <div class="empty-tip" id="emptyTip">暂无记录，请在上方添加第一条账目</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  (function () {
+    var STORAGE_KEY = "company_accounts";
+
+    var form = document.getElementById("recordForm");
+    var dateInput = document.getElementById("date");
+    var summaryInput = document.getElementById("summary");
+    var categoryInput = document.getElementById("category");
+    var incomeInput = document.getElementById("income");
+    var expenseInput = document.getElementById("expense");
+    var tableBody = document.getElementById("recordTableBody");
+    var emptyTip = document.getElementById("emptyTip");
+    var totalIncomeEl = document.getElementById("totalIncome");
+    var totalExpenseEl = document.getElementById("totalExpense");
+    var balanceEl = document.getElementById("balance");
+    var clearAllBtn = document.getElementById("clearAllBtn");
+    var toast = document.getElementById("toast");
+
+    dateInput.value = todayString();
+
+    function todayString() {
+      var d = new Date();
+      var m = String(d.getMonth() + 1).padStart(2, "0");
+      var day = String(d.getDate()).padStart(2, "0");
+      return d.getFullYear() + "-" + m + "-" + day;
+    }
+
+    function formatMoney(num) {
+      return "¥" + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(function () { toast.classList.remove("show"); }, 2200);
+    }
+
+    function loadRecords() {
+      try {
+        var data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function render() {
+      var records = loadRecords();
+      tableBody.innerHTML = "";
+
+      if (records.length === 0) {
+        emptyTip.style.display = "block";
+      } else {
+        emptyTip.style.display = "none";
+        records.forEach(function (record) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + record.date + "</td>" +
+            "<td>" + escapeHtml(record.summary) + "</td>" +
+            '<td><span class="category-tag">' + escapeHtml(record.category) + "</span></td>" +
+            '<td class="' + (record.income > 0 ? "amount-income" : "amount-empty") + '">' +
+              (record.income > 0 ? formatMoney(record.income) : "—") + "</td>" +
+            '<td class="' + (record.expense > 0 ? "amount-expense" : "amount-empty") + '">' +
+              (record.expense > 0 ? formatMoney(record.expense) : "—") + "</td>" +
+            '<td><button class="btn-sm" data-id="' + record.id + '">删除</button></td>';
+          tableBody.appendChild(tr);
+        });
+      }
+
+      updateStats(records);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function updateStats(records) {
+      var totalIncome = 0;
+      var totalExpense = 0;
+      records.forEach(function (r) {
+        totalIncome += r.income || 0;
+        totalExpense += r.expense || 0;
+      });
+      totalIncomeEl.textContent = formatMoney(totalIncome);
+      totalExpenseEl.textContent = formatMoney(totalExpense);
+      balanceEl.textContent = formatMoney(totalIncome - totalExpense);
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      var income = parseFloat(incomeInput.value) || 0;
+      var expense = parseFloat(expenseInput.value) || 0;
+
+      if (income === 0 && expense === 0) {
+        showToast("请至少填写收入或支出金额");
+        return;
+      }
+
+      if (income > 0 && expense > 0) {
+        showToast("一条记录请只填写收入或支出，不要同时填写");
+        return;
+      }
+
+      var record = {
+        id: Date.now(),
+        date: dateInput.value,
+        summary: summaryInput.value.trim(),
+        category: categoryInput.value,
+        income: income,
+        expense: expense
+      };
+
+      var records = loadRecords();
+      records.unshift(record);
+      saveRecords(records);
+      render();
+
+      summaryInput.value = "";
+      categoryInput.value = "";
+      incomeInput.value = "";
+      expenseInput.value = "";
+      dateInput.value = todayString();
+
+      showToast("记录添加成功");
+    });
+
+    tableBody.addEventListener("click", function (e) {
+      if (e.target.classList.contains("btn-sm")) {
+        var id = Number(e.target.getAttribute("data-id"));
+        if (confirm("确定要删除这条记录吗？")) {
+          var records = loadRecords().filter(function (r) { return r.id !== id; });
+          saveRecords(records);
+          render();
+          showToast("记录已删除");
+        }
+      }
+    });
+
+    clearAllBtn.addEventListener("click", function () {
+      if (loadRecords().length === 0) {
+        showToast("当前没有记录");
+        return;
+      }
+      if (confirm("确定要清空所有账目记录吗？此操作不可恢复！")) {
+        localStorage.removeItem(STORAGE_KEY);
+        render();
+        showToast("已清空全部记录");
+      }
+    });
+
+    render();
+  })();
+  </script>
+</body>
+</html>
