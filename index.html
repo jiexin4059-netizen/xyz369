@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公司账目管理系统</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      color: #1f2937;
+      background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 55%, #e0f2fe 100%);
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      color: #0f172a;
+    }
+
+    .header p {
+      margin: 0;
+      color: #64748b;
+    }
+
+    .card {
+      margin-bottom: 24px;
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 700;
+      color: #334155;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 15px;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+    }
+
+    .primary-button {
+      color: #fff;
+      background: #2563eb;
+    }
+
+    .secondary-button {
+      color: #334155;
+      background: #e2e8f0;
+    }
+
+    .danger-button {
+      color: #fff;
+      background: #dc2626;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-item {
+      padding: 18px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .summary-item span {
+      display: block;
+      margin-bottom: 8px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .summary-item strong {
+      font-size: 24px;
+    }
+
+    .income {
+      color: #16a34a;
+    }
+
+    .expense {
+      color: #dc2626;
+    }
+
+    .balance {
+      color: #2563eb;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .empty {
+      padding: 28px 12px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .delete-record {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .form-grid,
+      .summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 20px, 1100px);
+        padding: 24px 0;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .form-grid,
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>公司账目管理系统</h1>
+      <p>记录每日收入和支出，数据会自动保存在当前浏览器中。</p>
+    </header>
+
+    <section class="card">
+      <form id="accountForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="date">日期</label>
+            <input type="date" id="date" required>
+          </div>
+
+          <div class="form-field">
+            <label for="summary">摘要</label>
+            <input type="text" id="summary" placeholder="例如：办公用品" required>
+          </div>
+
+          <div class="form-field">
+            <label for="category">类别</label>
+            <select id="category" required>
+              <option value="">请选择类别</option>
+              <option value="销售收入">销售收入</option>
+              <option value="服务收入">服务收入</option>
+              <option value="办公支出">办公支出</option>
+              <option value="工资支出">工资支出</option>
+              <option value="差旅支出">差旅支出</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="income">收入</label>
+            <input type="number" id="income" min="0" step="0.01" placeholder="0.00">
+          </div>
+
+          <div class="form-field">
+            <label for="expense">支出</label>
+            <input type="number" id="expense" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" class="primary-button">添加记录</button>
+          <button type="reset" class="secondary-button">清空输入</button>
+          <button type="button" id="clearAllButton" class="danger-button">删除全部记录</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="summary" aria-label="账目汇总">
+      <div class="summary-item">
+        <span>总收入</span>
+        <strong id="totalIncome" class="income">¥0.00</strong>
+      </div>
+      <div class="summary-item">
+        <span>总支出</span>
+        <strong id="totalExpense" class="expense">¥0.00</strong>
+      </div>
+      <div class="summary-item">
+        <span>结余</span>
+        <strong id="balance" class="balance">¥0.00</strong>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>摘要</th>
+              <th>类别</th>
+              <th>收入</th>
+              <th>支出</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="recordList"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "companyAccountRecords";
+
+    const form = document.getElementById("accountForm");
+    const dateInput = document.getElementById("date");
+    const summaryInput = document.getElementById("summary");
+    const categoryInput = document.getElementById("category");
+    const incomeInput = document.getElementById("income");
+    const expenseInput = document.getElementById("expense");
+    const recordList = document.getElementById("recordList");
+    const totalIncome = document.getElementById("totalIncome");
+    const totalExpense = document.getElementById("totalExpense");
+    const balance = document.getElementById("balance");
+    const clearAllButton = document.getElementById("clearAllButton");
+
+    let records = loadRecords();
+
+    function loadRecords() {
+      const savedRecords = localStorage.getItem(STORAGE_KEY);
+      if (!savedRecords) {
+        return [];
+      }
+
+      try {
+        return JSON.parse(savedRecords);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveRecords() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function formatMoney(amount) {
+      return `¥${Number(amount).toFixed(2)}`;
+    }
+
+    function setTodayAsDefaultDate() {
+      dateInput.value = new Date().toISOString().slice(0, 10);
+    }
+
+    function renderRecords() {
+      recordList.innerHTML = "";
+
+      if (records.length === 0) {
+        recordList.innerHTML = '<tr><td class="empty" colspan="6">暂无记录，请先添加一条账目。</td></tr>';
+        updateSummary();
+        return;
+      }
+
+      records.forEach((record, index) => {
+        const row = document.createElement("tr");
+        const values = [
+          record.date,
+          record.summary,
+          record.category,
+          formatMoney(record.income),
+          formatMoney(record.expense)
+        ];
+
+        values.forEach((value, cellIndex) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+
+          if (cellIndex === 3) {
+            cell.className = "income";
+          }
+
+          if (cellIndex === 4) {
+            cell.className = "expense";
+          }
+
+          row.appendChild(cell);
+        });
+
+        const actionCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger-button delete-record";
+        deleteButton.dataset.index = index;
+        deleteButton.textContent = "删除";
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        recordList.appendChild(row);
+      });
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const incomeSum = records.reduce((sum, record) => sum + record.income, 0);
+      const expenseSum = records.reduce((sum, record) => sum + record.expense, 0);
+      const balanceSum = incomeSum - expenseSum;
+
+      totalIncome.textContent = formatMoney(incomeSum);
+      totalExpense.textContent = formatMoney(expenseSum);
+      balance.textContent = formatMoney(balanceSum);
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const income = Number(incomeInput.value || 0);
+      const expense = Number(expenseInput.value || 0);
+
+      if (income === 0 && expense === 0) {
+        alert("收入和支出至少填写一项。");
+        return;
+      }
+
+      const record = {
+        date: dateInput.value,
+        summary: summaryInput.value.trim(),
+        category: categoryInput.value,
+        income,
+        expense
+      };
+
+      records.unshift(record);
+      saveRecords();
+      renderRecords();
+      form.reset();
+      setTodayAsDefaultDate();
+    });
+
+    recordList.addEventListener("click", function (event) {
+      if (!event.target.classList.contains("delete-record")) {
+        return;
+      }
+
+      const index = Number(event.target.dataset.index);
+      records.splice(index, 1);
+      saveRecords();
+      renderRecords();
+    });
+
+    clearAllButton.addEventListener("click", function () {
+      if (!confirm("确定要删除全部账目记录吗？")) {
+        return;
+      }
+
+      records = [];
+      saveRecords();
+      renderRecords();
+    });
+
+    setTodayAsDefaultDate();
+    renderRecords();
+  </script>
+</body>
+</html>
