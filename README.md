@@ -1,94 +1,44 @@
-# 公司账目管理系统（云端多人版）
+# Bank Input · 公司账目管理系统
 
-一个支持**多人共用、云端同步**的公司账目管理网页系统。
+云端多人版账目管理系统，界面参照 **Bank Input** 专业布局设计。
 
-## 功能
+## 界面功能
 
-- **云端数据**：所有账目保存在服务器，多人可同时使用
-- **统一登入**：一个登入账号可访问多家公司
-- **创建新公司**：登入后可随时创建新公司，自动成为管理员
-- **多银行管理**：每家公司可独立管理多个银行
-- **单据录入**：时间、Ref、In（收入）、Out（支出）
-- **系统设置**：添加员工、银行、登入账号
-- **导出 Excel**：导出 CSV 文件，Excel 可直接打开
+- **顶部栏**：Company 公司选择、Transaction Date 交易日期
+- **银行标签页**：横向切换不同银行/支付账户（如 HQ、WinFaPay、WePay 等）
+- **账户信息**：Bank Account No、Name、Balance
+- **中间表格**：Time、Reference、In、Out、Type、BC、Category、Kiosk、SID、PID、Credit、Rate、Bonus、Tips、Remark、Employee
+- **右侧表单**：New Transaction 录入区，支持 In/Out 切换
 
 ## 快速开始
 
-### 1. 安装依赖
-
 ```bash
 npm install
-```
-
-### 2. 启动服务器
-
-```bash
 npm start
 ```
 
-### 3. 打开浏览器
-
-访问 [http://localhost:3000](http://localhost:3000)
+浏览器打开 http://localhost:3000
 
 ## 演示账号
 
-| 登入账号 | 密码 | 说明 |
-|----------|------|------|
-| admin | 123456 | 可访问多家公司，管理员权限 |
-| lisi | 123456 | 只能访问华东贸易 |
+| 登入账号 | 密码 |
+|----------|------|
+| admin | 123456 |
+| lisi | 123456 |
 
-## 部署到云端（让同事一起用）
+## 部署到云端
 
-把项目部署到云服务器后，所有人访问同一个网址即可共用数据。
-
-### 方式一：使用云服务器（推荐）
-
-1. 将代码上传到服务器（如阿里云、腾讯云、AWS 等）
-2. 安装 Node.js 18+
-3. 运行：
+部署到云服务器后，同事访问同一网址即可共用数据。生产环境请设置：
 
 ```bash
-npm install
-npm start
-```
-
-4. 设置环境变量（生产环境必改）：
-
-```bash
-export PORT=3000
 export JWT_SECRET=你的随机密钥
 ```
-
-5. 用 Nginx 反向代理，或直接用 `http://服务器IP:3000` 访问
-
-### 方式二：使用 Railway / Render 等平台
-
-1. 将代码推送到 GitHub
-2. 在 Railway 或 Render 创建新项目，连接 GitHub 仓库
-3. 设置启动命令：`npm start`
-4. 添加环境变量 `JWT_SECRET`
-5. 平台会自动分配网址，分享给同事即可
 
 ## 项目结构
 
 ```
-├── public/index.html    # 前端页面
-├── server/
-│   ├── index.js         # API 服务器
-│   └── db.js            # 数据库（SQLite）
-├── data/accounts.db     # 数据文件（自动生成）
-├── package.json
-└── README.md
+public/index.html   # Bank Input 界面
+server/index.js     # API 服务器
+server/db.js        # SQLite 数据库
+data/accounts.db    # 数据文件（自动创建）
 ```
-
-## 数据说明
-
-- 数据保存在 `data/accounts.db`（SQLite 数据库）
-- 定期备份此文件即可保留所有账目
-- 不同公司员工、银行、账目完全隔离
-
-## 注意事项
-
-- 生产环境务必修改 `JWT_SECRET` 环境变量
-- 建议定期备份 `data/accounts.db`
-- 如需更高安全性，可后续添加 HTTPS 和更强密码策略

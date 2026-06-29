@@ -3,283 +3,368 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>公司账目管理系统</title>
+  <title>Bank Input</title>
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh;
-      font-family: Arial, "Microsoft YaHei", sans-serif;
-      color: #1f2937;
-      background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 55%, #e0f2fe 100%);
+      margin: 0;
+      font-family: "Segoe UI", Arial, "Microsoft YaHei", sans-serif;
+      color: #1e293b;
+      background: #eef2f7;
     }
-    .page { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0; }
     .hidden { display: none !important; }
-    .header { margin-bottom: 24px; text-align: center; }
-    .header h1 { margin: 0 0 8px; font-size: 32px; color: #0f172a; }
-    .header p { margin: 0; color: #64748b; }
-    .cloud-badge {
-      display: inline-block; margin-top: 10px; padding: 6px 12px;
-      border-radius: 999px; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 700;
+
+    /* Login */
+    .login-wrap {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(135deg, #1e3a5f, #334155);
     }
-    .card {
-      margin-bottom: 24px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 18px;
-      background: rgba(255,255,255,0.9); box-shadow: 0 18px 45px rgba(15,23,42,0.08);
+    .login-card {
+      width: min(420px, 100%); background: #fff; border-radius: 12px; padding: 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     }
-    .login-card { width: min(460px, calc(100% - 32px)); margin: 60px auto; }
-    .login-card h2, .section-title { margin: 0 0 8px; color: #0f172a; }
-    .login-card h2 { text-align: center; }
-    .subtitle { margin: 0 0 24px; text-align: center; color: #64748b; font-size: 14px; }
-    .form-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-    .form-field.compact { margin-bottom: 0; }
-    label { font-weight: 700; color: #334155; }
-    input, select {
-      width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 12px;
-      font-size: 15px; background: #fff; outline: none;
+    .login-card h1 { margin: 0 0 8px; font-size: 28px; }
+    .login-card p { margin: 0 0 24px; color: #64748b; }
+    .error { background: #fef2f2; color: #b91c1c; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+
+    /* App shell */
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar {
+      display: flex; align-items: center; gap: 16px; padding: 0 16px; height: 56px;
+      background: #1e293b; color: #fff; flex-wrap: wrap;
     }
-    input:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: end; }
-    .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: end; }
-    .button-row { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
-    button {
-      border: 0; border-radius: 12px; padding: 12px 18px; font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    .menu-btn {
+      width: 36px; height: 36px; border: 0; border-radius: 8px; background: #334155;
+      color: #fff; font-size: 18px; cursor: pointer;
     }
-    button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(15,23,42,0.12); }
-    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .primary-button { color: #fff; background: #2563eb; }
-    .secondary-button { color: #334155; background: #e2e8f0; }
-    .danger-button { color: #fff; background: #dc2626; }
-    .success-button { color: #fff; background: #16a34a; }
-    .full-width-button { width: 100%; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .user-info {
-      padding: 12px 18px; border-radius: 14px; background: rgba(255,255,255,0.9);
-      border: 1px solid #e2e8f0; box-shadow: 0 8px 20px rgba(15,23,42,0.06);
+    .topbar-title { font-size: 20px; font-weight: 700; min-width: 120px; }
+    .topbar-field { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .topbar-field label { color: #94a3b8; white-space: nowrap; }
+    .topbar select, .topbar input[type="date"] {
+      height: 34px; border: 1px solid #475569; border-radius: 6px; background: #0f172a;
+      color: #fff; padding: 0 10px; font-size: 13px;
     }
-    .user-info strong { color: #0f172a; }
-    .user-info span { color: #64748b; font-size: 14px; }
-    .company-switcher { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .company-switcher select { max-width: 280px; }
-    .bank-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .topbar-spacer { flex: 1; }
+    .topbar-user { font-size: 13px; color: #cbd5e1; }
+    .topbar button.ghost {
+      height: 34px; border: 1px solid #475569; border-radius: 6px; background: transparent;
+      color: #e2e8f0; padding: 0 12px; cursor: pointer; font-size: 13px;
+    }
+
+    /* Bank tabs */
+    .bank-tabs-wrap {
+      background: #fff; border-bottom: 1px solid #dbe3ee; overflow-x: auto;
+    }
+    .bank-tabs {
+      display: flex; gap: 0; min-width: max-content; padding: 0 8px;
+    }
     .bank-tab {
-      padding: 10px 18px; border-radius: 999px; border: 1px solid #cbd5e1;
-      background: #fff; color: #334155; font-weight: 700; cursor: pointer;
+      padding: 12px 18px; border: 0; border-bottom: 3px solid transparent;
+      background: transparent; color: #475569; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
     }
-    .bank-tab.active { background: #2563eb; border-color: #2563eb; color: #fff; }
-    .bank-title { margin: 0 0 16px; font-size: 20px; color: #0f172a; }
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
-    .summary-item {
-      padding: 18px; border-radius: 16px; background: #fff; border: 1px solid #e2e8f0;
-      box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+    .bank-tab.active {
+      color: #2563eb; border-bottom-color: #2563eb; background: #f8fbff;
     }
-    .summary-item span { display: block; margin-bottom: 8px; color: #64748b; font-size: 14px; }
-    .summary-item strong { font-size: 24px; }
-    .income { color: #16a34a; } .expense { color: #dc2626; } .balance { color: #2563eb; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 680px; }
-    th, td { padding: 14px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #475569; font-size: 14px; }
-    .empty { padding: 28px 12px; text-align: center; color: #94a3b8; }
-    .delete-record { padding: 8px 12px; font-size: 13px; }
-    .login-hint, .info-box {
-      margin-top: 20px; padding: 14px; border-radius: 12px; background: #f8fafc;
-      border: 1px solid #e2e8f0; font-size: 13px; color: #64748b; line-height: 1.7;
+    .bank-tab .check { color: #16a34a; margin-left: 4px; }
+
+    /* Account bar */
+    .account-bar {
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+      padding: 12px 16px; background: #fff; border-bottom: 1px solid #dbe3ee;
     }
-    .login-hint code { padding: 2px 6px; border-radius: 6px; background: #e2e8f0; }
-    .error-message {
-      margin-bottom: 16px; padding: 12px 14px; border-radius: 12px;
-      background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 14px;
+    .account-item { font-size: 13px; color: #64748b; }
+    .account-item strong { color: #0f172a; margin-left: 6px; }
+    .account-spacer { flex: 1; }
+    .search-box {
+      display: flex; gap: 8px; align-items: center;
     }
-    .company-list { display: grid; gap: 12px; margin-top: 20px; }
-    .company-option {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 18px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; cursor: pointer;
+    .search-box input {
+      width: 200px; height: 34px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 10px;
     }
-    .company-option:hover { border-color: #2563eb; box-shadow: 0 8px 20px rgba(37,99,235,0.12); }
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .settings-panel { padding: 18px; border: 1px solid #e2e8f0; border-radius: 14px; background: #f8fafc; }
-    .settings-panel h3 { margin: 0 0 14px; font-size: 16px; }
-    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .btn {
+      height: 34px; border: 0; border-radius: 6px; padding: 0 14px; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-insert {
+      width: 100%; height: 44px; font-size: 15px; margin-top: 8px;
+      background: #2563eb; color: #fff; border: 0; border-radius: 8px; cursor: pointer; font-weight: 700;
+    }
+
+    /* Main layout */
+    .main-layout { display: flex; flex: 1; min-height: 0; }
+    .table-panel {
+      flex: 1; min-width: 0; background: #fff; margin: 12px 0 12px 12px;
+      border: 1px solid #dbe3ee; border-radius: 8px; display: flex; flex-direction: column;
+    }
+    .table-scroll { overflow: auto; flex: 1; }
+    table.data-table {
+      width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1400px;
+    }
+    .data-table th {
+      position: sticky; top: 0; background: #f8fafc; color: #475569;
+      padding: 10px 8px; border-bottom: 1px solid #dbe3ee; text-align: left; white-space: nowrap;
+    }
+    .data-table td {
+      padding: 8px; border-bottom: 1px solid #f1f5f9; white-space: nowrap;
+    }
+    .data-table tr:hover td { background: #f8fbff; }
+    .data-table .in { color: #16a34a; }
+    .data-table .out { color: #dc2626; }
+    .empty-row { text-align: center; color: #94a3b8; padding: 40px !important; }
+
+    /* Sidebar form */
+    .sidebar {
+      width: 320px; flex-shrink: 0; background: #fff; margin: 12px 12px 12px 0;
+      border: 1px solid #dbe3ee; border-radius: 8px; padding: 16px; overflow-y: auto;
+    }
+    .sidebar h2 {
+      margin: 0 0 16px; font-size: 16px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;
+    }
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 13px;
+    }
+    .field textarea { min-height: 70px; resize: vertical; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .radio-row { display: flex; gap: 16px; margin-bottom: 12px; }
+    .radio-row label { font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    /* Drawer */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 100;
+    }
+    .drawer {
+      position: fixed; top: 0; left: 0; width: min(360px, 90vw); height: 100%;
+      background: #fff; z-index: 101; padding: 20px; overflow-y: auto;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    }
+    .drawer h3 { margin: 20px 0 10px; font-size: 14px; color: #0f172a; }
+    .drawer-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .tag {
-      display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
-      border-radius: 999px; background: #e2e8f0; color: #334155; font-size: 13px;
+      padding: 4px 8px; background: #e2e8f0; border-radius: 999px; font-size: 12px;
     }
-    .tag button { padding: 0 4px; background: transparent; color: #64748b; font-size: 14px; box-shadow: none; }
-    .tabs-nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-button { padding: 10px 16px; border-radius: 10px; background: #e2e8f0; color: #334155; }
-    .tab-button.active { background: #2563eb; color: #fff; }
-    @media (max-width: 900px) {
-      .form-grid, .form-grid-3, .summary, .settings-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .company-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
     }
-    @media (max-width: 620px) {
-      .page { width: min(100% - 20px, 1100px); padding: 24px 0; }
-      .form-grid, .form-grid-3, .summary, .settings-grid { grid-template-columns: 1fr; }
+    .company-card {
+      width: min(500px, 100%); background: #fff; border-radius: 12px; padding: 28px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+    .company-option {
+      display: flex; justify-content: space-between; width: 100%; padding: 14px 16px;
+      margin-top: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer;
+    }
+    .company-option:hover { border-color: #2563eb; }
+
+    @media (max-width: 960px) {
+      .main-layout { flex-direction: column; }
+      .sidebar { width: auto; margin: 0 12px 12px; }
+      .table-panel { margin: 12px; }
     }
   </style>
 </head>
 <body>
-  <section id="loginPage" class="login-card card">
-    <h2>公司账目管理系统</h2>
-    <p class="subtitle">云端版 · 多人共用数据</p>
-    <div id="loginError" class="error-message hidden"></div>
-    <form id="loginForm">
-      <div class="form-field">
-        <label for="loginId">登入账号</label>
-        <input type="text" id="loginId" placeholder="例如：admin" required autocomplete="username">
-      </div>
-      <div class="form-field">
-        <label for="password">密码</label>
-        <input type="password" id="password" placeholder="请输入密码" required autocomplete="current-password">
-      </div>
-      <button type="submit" class="primary-button full-width-button">登入</button>
-    </form>
-    <div class="login-hint">
-      <strong>演示账号：</strong><br>
-      登入账号 <code>admin</code>，密码 <code>123456</code><br>
-      可访问多家公司，数据保存在云端服务器
+  <!-- Login -->
+  <div id="loginPage" class="login-wrap">
+    <div class="login-card">
+      <h1>Bank Input</h1>
+      <p>公司账目管理系统 · 云端多人版</p>
+      <div id="loginError" class="error hidden"></div>
+      <form id="loginForm">
+        <div class="field"><label>登入账号</label><input id="loginId" placeholder="admin" required></div>
+        <div class="field"><label>密码</label><input id="password" type="password" placeholder="123456" required></div>
+        <button class="btn-insert" type="submit">登入</button>
+      </form>
+      <p style="margin-top:16px;font-size:13px;color:#64748b;">演示：admin / 123456</p>
     </div>
-  </section>
+  </div>
 
-  <section id="companyPage" class="login-card card hidden">
-    <h2>选择公司</h2>
-    <p class="subtitle">你的账号可访问以下公司</p>
-    <div id="companyList" class="company-list"></div>
-    <div class="button-row">
-      <button type="button" id="createCompanyOpenButton" class="primary-button">+ 创建新公司</button>
-      <button type="button" id="backToLoginButton" class="secondary-button">返回登入</button>
+  <!-- Company select -->
+  <div id="companyPage" class="company-page hidden">
+    <div class="company-card">
+      <h2>选择公司</h2>
+      <p style="color:#64748b;">请选择要进入的公司</p>
+      <div id="companyList"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="createCompanyOpenButton" type="button">+ 创建新公司</button>
+        <button class="btn btn-secondary" id="backToLoginButton" type="button">返回登入</button>
+      </div>
+      <form id="createCompanyForm" class="hidden" style="margin-top:16px;">
+        <div class="field"><label>新公司名称</label><input id="newCompanyName" required></div>
+        <button class="btn btn-primary" type="submit">确认创建</button>
+      </form>
     </div>
-    <form id="createCompanyForm" class="hidden" style="margin-top:20px;">
-      <div class="form-field">
-        <label for="newCompanyName">新公司名称</label>
-        <input type="text" id="newCompanyName" placeholder="例如：北京分公司" required>
-      </div>
-      <div class="button-row">
-        <button type="submit" class="primary-button">确认创建</button>
-        <button type="button" id="createCompanyCancelButton" class="secondary-button">取消</button>
-      </div>
-    </form>
-  </section>
+  </div>
 
-  <main id="mainPage" class="page hidden">
-    <div class="top-bar">
-      <div class="user-info">
-        <strong id="userName">员工</strong><br>
-        <span>登入账号：<span id="userLoginId"></span> · 员工号：<span id="userEmployeeId"></span></span>
+  <!-- Main app -->
+  <div id="mainPage" class="app hidden">
+    <header class="topbar">
+      <button class="menu-btn" id="menuButton" type="button" aria-label="菜单">☰</button>
+      <div class="topbar-title">Bank Input</div>
+      <div class="topbar-field">
+        <label>Company</label>
+        <select id="companySelect"></select>
       </div>
-      <div class="top-actions">
-        <button type="button" id="settingsButton" class="secondary-button hidden">系统设置</button>
-        <button type="button" id="logoutButton" class="secondary-button">退出登入</button>
+      <div class="topbar-field">
+        <label>Transaction Date</label>
+        <input type="date" id="transactionDate">
       </div>
-    </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-user" id="userInfo"></div>
+      <button class="ghost" id="exportAllButton" type="button">导出 Excel</button>
+      <button class="ghost" id="logoutButton" type="button">退出</button>
+    </header>
 
-    <div class="company-switcher">
-      <label for="companySelect">当前公司</label>
-      <select id="companySelect"></select>
-      <button type="button" id="createCompanyMainButton" class="secondary-button">+ 创建新公司</button>
+    <div class="bank-tabs-wrap">
+      <div class="bank-tabs" id="bankTabs"></div>
     </div>
 
-    <nav class="tabs-nav">
-      <button type="button" class="tab-button active" data-tab="records">单据录入</button>
-      <button type="button" class="tab-button" data-tab="settings" id="settingsTabButton">系统设置</button>
-    </nav>
+    <div class="account-bar">
+      <div class="account-item">Bank Account No<strong id="bankAccountNo">-</strong></div>
+      <div class="account-item">Bank Account Name<strong id="bankAccountName">-</strong></div>
+      <div class="account-item">Bank Account Balance<strong id="bankBalance">0.00</strong></div>
+      <div class="account-spacer"></div>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <button class="btn btn-secondary" id="filterButton" type="button">Filter</button>
+      </div>
+    </div>
 
-    <div id="recordsTab">
-      <header class="header">
-        <h1>单据录入</h1>
-        <p>选择银行后录入单据，所有同事可实时共用云端数据</p>
-        <div class="cloud-badge">☁️ 云端同步 · 多人共用</div>
-      </header>
-      <nav class="bank-tabs" id="bankTabs"></nav>
-      <section class="card">
-        <h2 class="bank-title" id="currentBankTitle">当前银行</h2>
-        <form id="recordForm">
-          <div class="form-grid">
-            <div class="form-field compact"><label for="time">时间</label><input type="datetime-local" id="time" required></div>
-            <div class="form-field compact"><label for="ref">Ref（参考号）</label><input type="text" id="ref" placeholder="例如：TXN20240629001" required></div>
-            <div class="form-field compact"><label for="inAmount">In（收入）</label><input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00"></div>
-            <div class="form-field compact"><label for="outAmount">Out（支出）</label><input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00"></div>
-          </div>
-          <div class="button-row">
-            <button type="submit" class="primary-button">添加单据</button>
-            <button type="reset" class="secondary-button">清空输入</button>
-            <button type="button" id="exportBankButton" class="success-button">导出本银行 Excel</button>
-            <button type="button" id="exportAllButton" class="success-button">导出本公司全部 Excel</button>
-            <button type="button" id="clearBankButton" class="danger-button">删除本银行全部记录</button>
-          </div>
-        </form>
-      </section>
-      <section class="summary">
-        <div class="summary-item"><span>总收入 (In)</span><strong id="totalIn" class="income">¥0.00</strong></div>
-        <div class="summary-item"><span>总支出 (Out)</span><strong id="totalOut" class="expense">¥0.00</strong></div>
-        <div class="summary-item"><span>结余</span><strong id="balance" class="balance">¥0.00</strong></div>
-      </section>
-      <section class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>时间</th><th>Ref</th><th>In（收入）</th><th>Out（支出）</th><th>操作</th></tr></thead>
+    <div class="main-layout">
+      <section class="table-panel">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Reference</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>Type</th>
+                <th>BC</th>
+                <th>Category</th>
+                <th>Kiosk</th>
+                <th>SID</th>
+                <th>PID</th>
+                <th>Credit</th>
+                <th>Rate</th>
+                <th>Bonus</th>
+                <th>Tips</th>
+                <th>Remark</th>
+                <th>Employee</th>
+                <th></th>
+              </tr>
+            </thead>
             <tbody id="recordList"></tbody>
           </table>
         </div>
       </section>
+
+      <aside class="sidebar">
+        <h2>New Transaction</h2>
+        <form id="recordForm">
+          <div class="radio-row">
+            <label><input type="radio" name="txType" value="In" checked> In</label>
+            <label><input type="radio" name="txType" value="Out"> Out</label>
+          </div>
+          <div class="field"><label>Time</label><input type="datetime-local" id="time" required></div>
+          <div class="field"><label>Reference</label><input id="ref" placeholder="Bank reference no" required></div>
+          <div class="field"><label id="amountLabel">In</label><input type="number" id="amount" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="field">
+            <label>Category</label>
+            <select id="category">
+              <option value="GAME">GAME</option>
+              <option value="TRANSFER">TRANSFER</option>
+              <option value="EXPENSE">EXPENSE</option>
+              <option value="OTHER">OTHER</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Server</label>
+            <select id="kiosk">
+              <option value="UNCLAIMED">UNCLAIMED</option>
+              <option value="SERVER-A">SERVER-A</option>
+              <option value="SERVER-B">SERVER-B</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>SID</label><input id="sid"></div>
+            <div class="field"><label>PID</label><input id="pid"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Credit amount</label><input type="number" id="credit" min="0" step="0.01"></div>
+            <div class="field"><label>Rate</label><input type="number" id="rate" min="0" step="0.01"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Bonus</label><input type="number" id="bonus" min="0" step="0.01"></div>
+            <div class="field"><label>%</label><input type="number" id="bonusPercent" min="0" step="0.01"></div>
+          </div>
+          <div class="field"><label>Total</label><input id="total" readonly></div>
+          <div class="field"><label>Remarks</label><textarea id="remark" placeholder="Extra remarks notes"></textarea></div>
+          <div class="field"><label>BC</label><input id="bc"></div>
+          <div class="field"><label>Tips</label><input type="number" id="tips" min="0" step="0.01"></div>
+          <button class="btn-insert" type="submit">Insert</button>
+        </form>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Settings drawer -->
+  <div id="drawerOverlay" class="drawer-overlay hidden"></div>
+  <aside id="drawer" class="drawer hidden">
+    <h2>系统设置</h2>
+    <button class="btn btn-secondary" id="closeDrawerButton" type="button">关闭</button>
+
+    <div class="drawer-section">
+      <h3>创建新公司</h3>
+      <form id="createCompanySettingsForm">
+        <div class="field"><input id="settingsCompanyName" placeholder="公司名称" required></div>
+        <button class="btn btn-primary" type="submit">创建</button>
+      </form>
     </div>
 
-    <div id="settingsTab" class="hidden">
-      <header class="header">
-        <h1>系统设置</h1>
-        <p>管理公司员工、银行和登入账号</p>
-      </header>
-      <section class="card">
-        <h2 class="section-title">创建新公司</h2>
-        <p class="subtitle" style="text-align:left;margin-bottom:16px;">创建后你将自动成为该公司的管理员，并可在顶部切换公司</p>
-        <form id="createCompanySettingsForm">
-          <div class="form-grid-3">
-            <div class="form-field compact">
-              <label for="settingsCompanyName">公司名称</label>
-              <input type="text" id="settingsCompanyName" placeholder="例如：北京分公司" required>
-            </div>
-          </div>
-          <div class="button-row"><button type="submit" class="primary-button">创建新公司</button></div>
-        </form>
-      </section>
-      <section class="card">
-        <div class="settings-grid">
-          <div class="settings-panel">
-            <h3>添加员工</h3>
-            <form id="addEmployeeForm">
-              <div class="form-field"><label for="newEmployeeId">员工号</label><input type="text" id="newEmployeeId" placeholder="EMP004" required></div>
-              <div class="form-field"><label for="newEmployeeName">姓名</label><input type="text" id="newEmployeeName" placeholder="赵六" required></div>
-              <div class="form-field">
-                <label for="newEmployeeRole">角色</label>
-                <select id="newEmployeeRole"><option value="user">普通员工</option><option value="admin">管理员</option></select>
-              </div>
-              <button type="submit" class="primary-button">添加员工</button>
-            </form>
-            <div class="tag-list" id="employeeList"></div>
-          </div>
-          <div class="settings-panel">
-            <h3>添加银行</h3>
-            <form id="addBankForm">
-              <div class="form-field"><label for="newBankName">银行名称</label><input type="text" id="newBankName" placeholder="交通银行" required></div>
-              <button type="submit" class="primary-button">添加银行</button>
-            </form>
-            <div class="tag-list" id="bankList"></div>
-          </div>
+    <div class="drawer-section" id="adminSection">
+      <h3>添加银行</h3>
+      <form id="addBankForm">
+        <div class="field"><input id="newBankName" placeholder="银行名称" required></div>
+        <div class="field"><input id="newBankAccountNo" placeholder="账号（可选）"></div>
+        <button class="btn btn-primary" type="submit">添加银行</button>
+      </form>
+      <div class="tag-list" id="bankList"></div>
+
+      <h3>添加员工</h3>
+      <form id="addEmployeeForm">
+        <div class="field"><input id="newEmployeeId" placeholder="员工号 EMP004" required></div>
+        <div class="field"><input id="newEmployeeName" placeholder="姓名" required></div>
+        <div class="field">
+          <select id="newEmployeeRole">
+            <option value="user">普通员工</option>
+            <option value="admin">管理员</option>
+          </select>
         </div>
-      </section>
-      <section class="card">
-        <h2 class="section-title">创建登入账号</h2>
-        <form id="addAccountForm">
-          <div class="form-grid-3">
-            <div class="form-field compact"><label for="newLoginId">登入账号</label><input type="text" id="newLoginId" required></div>
-            <div class="form-field compact"><label for="newLoginPassword">密码</label><input type="password" id="newLoginPassword" required></div>
-            <div class="form-field compact"><label for="newLoginEmployeeId">对应员工号</label><input type="text" id="newLoginEmployeeId" required></div>
-          </div>
-          <div class="button-row"><button type="submit" class="primary-button">创建登入账号</button></div>
-        </form>
-      </section>
+        <button class="btn btn-primary" type="submit">添加员工</button>
+      </form>
+      <div class="tag-list" id="employeeList"></div>
+
+      <h3>创建登入账号</h3>
+      <form id="addAccountForm">
+        <div class="field"><input id="newLoginId" placeholder="登入账号" required></div>
+        <div class="field"><input id="newLoginPassword" type="password" placeholder="密码" required></div>
+        <div class="field"><input id="newLoginEmployeeId" placeholder="对应员工号" required></div>
+        <button class="btn btn-primary" type="submit">创建账号</button>
+      </form>
     </div>
-  </main>
+  </aside>
 
   <script>
     const TOKEN_KEY = "companyAccountToken";
@@ -289,6 +374,7 @@
     let session = null;
     let currentCompany = null;
     let currentRecords = [];
+    let filteredRecords = [];
     let currentBank = null;
     let pendingAccount = null;
 
@@ -297,82 +383,83 @@
     async function api(path, options = {}) {
       const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
       if (token) headers.Authorization = "Bearer " + token;
-
       const response = await fetch(path, { ...options, headers });
       const data = await response.json().catch(() => ({}));
-
       if (!response.ok) {
-        if (response.status === 401) {
-          logout();
-        }
+        if (response.status === 401) logout();
         throw new Error(data.error || "请求失败");
       }
       return data;
     }
 
-    function saveToken(value) {
-      token = value;
-      sessionStorage.setItem(TOKEN_KEY, value);
-    }
+    function saveToken(v) { token = v; sessionStorage.setItem(TOKEN_KEY, v); }
+    function saveSession(v) { session = v; sessionStorage.setItem(SESSION_KEY, JSON.stringify(v)); }
+    function loadSession() { try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch { return null; } }
 
-    function saveSession(value) {
-      session = value;
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(value));
-    }
-
-    function loadSession() {
-      try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch { return null; }
-    }
-
-    function formatMoney(n) { return "¥" + Number(n).toFixed(2); }
-
-    function formatDateTime(value) {
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return value;
+    function formatMoney(n) { return Number(n || 0).toFixed(2); }
+    function formatDateTime(v) {
+      const d = new Date(v);
+      if (Number.isNaN(d.getTime())) return v || "";
       const p = (n) => String(n).padStart(2, "0");
-      return date.getFullYear() + "-" + p(date.getMonth() + 1) + "-" + p(date.getDate()) + " " + p(date.getHours()) + ":" + p(date.getMinutes());
+      return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
     }
 
-    function setNowAsDefaultTime() {
+    function setToday() {
       const now = new Date();
+      $("transactionDate").value = now.toISOString().slice(0, 10);
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       $("time").value = now.toISOString().slice(0, 16);
     }
 
-    function hideAllPages() {
+    function getTxType() {
+      return document.querySelector('input[name="txType"]:checked').value;
+    }
+
+    function updateAmountLabel() {
+      const type = getTxType();
+      $("amountLabel").textContent = type;
+    }
+
+    function updateTotal() {
+      const amount = Number($("amount").value || 0);
+      const credit = Number($("credit").value || 0);
+      const rate = Number($("rate").value || 0);
+      const bonus = Number($("bonus").value || 0);
+      const creditTotal = credit * rate;
+      $("total").value = formatMoney(amount || creditTotal + bonus);
+    }
+
+    function isAdmin() {
+      return currentCompany.employees.some((e) => e.employeeId === session.employeeId && e.role === "admin");
+    }
+
+    function hideAll() {
       $("loginPage").classList.add("hidden");
       $("companyPage").classList.add("hidden");
       $("mainPage").classList.add("hidden");
     }
 
-    function showLoginPage() {
-      hideAllPages();
+    function showLogin() {
+      hideAll();
       $("loginPage").classList.remove("hidden");
       $("loginError").classList.add("hidden");
-      $("loginForm").reset();
-    }
-
-    function logout() {
       token = null;
       session = null;
-      sessionStorage.removeItem(TOKEN_KEY);
-      sessionStorage.removeItem(SESSION_KEY);
-      showLoginPage();
+      sessionStorage.clear();
     }
 
     function showCompanyPage(companies) {
-      hideAllPages();
+      hideAll();
       $("companyPage").classList.remove("hidden");
       $("createCompanyForm").classList.add("hidden");
       const list = $("companyList");
       list.innerHTML = "";
-
-      companies.forEach((company) => {
+      companies.forEach((c) => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "company-option";
-        btn.innerHTML = "<div><strong>" + company.name + "</strong><span>公司编号：" + company.id + "</span></div><span>进入 →</span>";
-        btn.addEventListener("click", () => enterCompany(company.id));
+        btn.innerHTML = "<div><strong>" + c.name + "</strong><br><small>" + c.id + "</small></div><span>→</span>";
+        btn.addEventListener("click", () => enterCompany(c.id));
         list.appendChild(btn);
       });
     }
@@ -381,15 +468,15 @@
       const data = await api("/api/companies/" + companyId);
       currentCompany = data.company;
       session = {
-        loginId: session.loginId || pendingAccount.loginId,
-        name: session.name || pendingAccount.name,
-        companyId: companyId,
+        loginId: session?.loginId || pendingAccount.loginId,
+        name: session?.name || pendingAccount.name,
+        companyId,
         employeeId: data.employeeId,
-        companies: session.companies || pendingAccount.companies
+        companies: session?.companies || pendingAccount.companies
       };
       saveSession(session);
-      currentBank = currentCompany.banks[0] || null;
-      await showMainPage();
+      currentBank = currentCompany.banks[0]?.name || null;
+      await showMain();
     }
 
     async function loadCompany(companyId) {
@@ -397,320 +484,292 @@
       currentCompany = data.company;
       session.employeeId = data.employeeId;
       saveSession(session);
-      if (!currentCompany.banks.includes(currentBank)) {
-        currentBank = currentCompany.banks[0] || null;
+      if (!currentCompany.banks.some((b) => b.name === currentBank)) {
+        currentBank = currentCompany.banks[0]?.name || null;
       }
     }
 
-    async function showMainPage() {
-      hideAllPages();
+    async function showMain() {
+      hideAll();
       $("mainPage").classList.remove("hidden");
-      $("userName").textContent = session.name;
-      $("userLoginId").textContent = session.loginId;
-      $("userEmployeeId").textContent = session.employeeId;
-
+      $("userInfo").textContent = session.name + " (" + session.employeeId + ")";
       renderCompanySelect();
       renderBankTabs();
+      updateBankInfo();
       await refreshRecords();
-      renderSettings();
-      setNowAsDefaultTime();
-      switchTab("records");
-
-      const isAdmin = currentCompany.employees.find((e) => e.employeeId === session.employeeId && e.role === "admin");
-      $("settingsButton").classList.toggle("hidden", !isAdmin);
-      $("settingsTabButton").classList.toggle("hidden", !isAdmin);
+      renderDrawerSettings();
+      setToday();
+      $("adminSection").classList.toggle("hidden", !isAdmin());
     }
 
     function renderCompanySelect() {
-      const select = $("companySelect");
-      select.innerHTML = "";
-      session.companies.forEach((company) => {
-        const option = document.createElement("option");
-        option.value = company.id;
-        option.textContent = company.name;
-        option.selected = company.id === session.companyId;
-        select.appendChild(option);
+      const sel = $("companySelect");
+      sel.innerHTML = "";
+      session.companies.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.name;
+        opt.selected = c.id === session.companyId;
+        sel.appendChild(opt);
       });
     }
 
     function renderBankTabs() {
       const tabs = $("bankTabs");
       tabs.innerHTML = "";
-      const banks = currentCompany.banks;
-
-      if (!banks.length) {
-        $("currentBankTitle").textContent = "请先添加银行";
-        return;
-      }
-
-      if (!currentBank || !banks.includes(currentBank)) currentBank = banks[0];
-
-      banks.forEach((bank) => {
+      currentCompany.banks.forEach((bank) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "bank-tab" + (bank === currentBank ? " active" : "");
-        btn.textContent = bank;
+        btn.className = "bank-tab" + (bank.name === currentBank ? " active" : "");
+        btn.innerHTML = bank.name + (bank.name === currentBank ? '<span class="check">✓</span>' : "");
         btn.addEventListener("click", async () => {
-          currentBank = bank;
+          currentBank = bank.name;
           renderBankTabs();
+          updateBankInfo();
           await refreshRecords();
-          setNowAsDefaultTime();
         });
         tabs.appendChild(btn);
       });
-
-      $("currentBankTitle").textContent = currentBank + " — 单据录入";
     }
 
-    async function refreshRecords() {
+    function updateBankInfo() {
+      const bank = currentCompany.banks.find((b) => b.name === currentBank);
+      $("bankAccountNo").textContent = bank?.accountNo || "-";
+      $("bankAccountName").textContent = bank?.name || "-";
+    }
+
+    function applyFilter() {
+      const q = $("searchInput").value.trim().toLowerCase();
+      filteredRecords = q
+        ? currentRecords.filter((r) =>
+            [r.ref, r.category, r.kiosk, r.sid, r.pid, r.remark, r.employeeName, r.employeeId]
+              .some((v) => String(v || "").toLowerCase().includes(q))
+          )
+        : currentRecords.slice();
+      renderTable();
+    }
+
+    function renderTable() {
       const tbody = $("recordList");
       tbody.innerHTML = "";
 
-      if (!currentBank) {
-        tbody.innerHTML = '<tr><td class="empty" colspan="5">请先在系统设置中添加银行。</td></tr>';
-        updateSummary([]);
+      if (!filteredRecords.length) {
+        tbody.innerHTML = '<tr><td class="empty-row" colspan="17">No Rows To Show</td></tr>';
         return;
       }
 
-      const data = await api("/api/companies/" + session.companyId + "/records?bank=" + encodeURIComponent(currentBank));
-      currentRecords = data.records;
-
-      if (!currentRecords.length) {
-        tbody.innerHTML = '<tr><td class="empty" colspan="5">暂无单据，请先添加一条记录。</td></tr>';
-        updateSummary([]);
-        return;
-      }
-
-      currentRecords.forEach((record) => {
+      filteredRecords.forEach((r) => {
         const row = document.createElement("tr");
-        [formatDateTime(record.time), record.ref, formatMoney(record.inAmount), formatMoney(record.outAmount)].forEach((val, i) => {
-          const cell = document.createElement("td");
-          cell.textContent = val;
-          if (i === 2) cell.className = "income";
-          if (i === 3) cell.className = "expense";
-          row.appendChild(cell);
+        const cells = [
+          formatDateTime(r.time), r.ref,
+          r.inAmount ? formatMoney(r.inAmount) : "",
+          r.outAmount ? formatMoney(r.outAmount) : "",
+          r.type, r.bc, r.category, r.kiosk, r.sid, r.pid,
+          r.credit ? formatMoney(r.credit) : "",
+          r.rate ? formatMoney(r.rate) : "",
+          r.bonus ? formatMoney(r.bonus) : "",
+          r.tips ? formatMoney(r.tips) : "",
+          r.remark,
+          r.employeeName || r.employeeId
+        ];
+        cells.forEach((val, i) => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          if (i === 2) td.className = "in";
+          if (i === 3) td.className = "out";
+          row.appendChild(td);
         });
         const action = document.createElement("td");
         const del = document.createElement("button");
-        del.type = "button";
-        del.className = "danger-button delete-record";
-        del.textContent = "删除";
-        del.dataset.id = record.id;
+        del.className = "btn btn-danger";
+        del.style.cssText = "padding:2px 8px;font-size:11px;";
+        del.textContent = "×";
+        del.addEventListener("click", async () => {
+          await api("/api/companies/" + session.companyId + "/records/" + r.id, { method: "DELETE" });
+          await refreshRecords();
+        });
         action.appendChild(del);
         row.appendChild(action);
         tbody.appendChild(row);
       });
-
-      updateSummary(currentRecords);
     }
 
-    function updateSummary(records) {
-      const inSum = records.reduce((s, r) => s + r.inAmount, 0);
-      const outSum = records.reduce((s, r) => s + r.outAmount, 0);
-      $("totalIn").textContent = formatMoney(inSum);
-      $("totalOut").textContent = formatMoney(outSum);
-      $("balance").textContent = formatMoney(inSum - outSum);
+    async function refreshRecords() {
+      if (!currentBank) {
+        currentRecords = [];
+        filteredRecords = [];
+        $("bankBalance").textContent = "0.00";
+        renderTable();
+        return;
+      }
+      const data = await api("/api/companies/" + session.companyId + "/records?bank=" + encodeURIComponent(currentBank));
+      currentRecords = data.records;
+      $("bankBalance").textContent = formatMoney(data.balance);
+      applyFilter();
     }
 
-    function renderSettings() {
-      const isAdmin = currentCompany.employees.find((e) => e.employeeId === session.employeeId && e.role === "admin");
-      if (!isAdmin) return;
-
-      const empList = $("employeeList");
+    function renderDrawerSettings() {
+      if (!isAdmin()) return;
       const bList = $("bankList");
-      empList.innerHTML = "";
+      const eList = $("employeeList");
       bList.innerHTML = "";
-
-      currentCompany.employees.forEach((employee) => {
+      eList.innerHTML = "";
+      currentCompany.banks.forEach((b) => {
         const tag = document.createElement("span");
         tag.className = "tag";
-        tag.textContent = employee.employeeId + " " + employee.name + " (" + (employee.role === "admin" ? "管理员" : "员工") + ")";
-        if (employee.employeeId !== session.employeeId) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = "×";
-          btn.addEventListener("click", async () => {
-            if (!confirm("确定删除员工 " + employee.name + " 吗？")) return;
-            const data = await api("/api/companies/" + session.companyId + "/employees/" + employee.employeeId, { method: "DELETE" });
-            currentCompany = data.company;
-            renderSettings();
-          });
-          tag.appendChild(btn);
-        }
-        empList.appendChild(tag);
-      });
-
-      currentCompany.banks.forEach((bank) => {
-        const tag = document.createElement("span");
-        tag.className = "tag";
-        tag.textContent = bank;
-        if (currentCompany.banks.length > 1) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = "×";
-          btn.addEventListener("click", async () => {
-            if (!confirm("确定删除银行「" + bank + "」吗？")) return;
-            const data = await api("/api/companies/" + session.companyId + "/banks/" + encodeURIComponent(bank), { method: "DELETE" });
-            currentCompany = data.company;
-            if (currentBank === bank) currentBank = currentCompany.banks[0];
-            renderBankTabs();
-            await refreshRecords();
-            renderSettings();
-          });
-          tag.appendChild(btn);
-        }
+        tag.textContent = b.name + (b.accountNo ? " (" + b.accountNo + ")" : "");
         bList.appendChild(tag);
       });
+      currentCompany.employees.forEach((e) => {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = e.employeeId + " " + e.name;
+        eList.appendChild(tag);
+      });
     }
 
-    function switchTab(name) {
-      document.querySelectorAll(".tab-button").forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === name));
-      $("recordsTab").classList.toggle("hidden", name !== "records");
-      $("settingsTab").classList.toggle("hidden", name !== "settings");
-      if (name === "settings") renderSettings();
+    function openDrawer() {
+      $("drawerOverlay").classList.remove("hidden");
+      $("drawer").classList.remove("hidden");
+      renderDrawerSettings();
+    }
+
+    function closeDrawer() {
+      $("drawerOverlay").classList.add("hidden");
+      $("drawer").classList.add("hidden");
     }
 
     function downloadCsv(filename, rows) {
-      const content = "\uFEFF" + rows.map((row) => row.map((cell) => '"' + String(cell == null ? "" : cell).replace(/"/g, '""') + '"').join(",")).join("\n");
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8;" }));
-      link.download = filename;
-      link.click();
-      URL.revokeObjectURL(link.href);
+      const content = "\uFEFF" + rows.map((row) => row.map((c) => '"' + String(c ?? "").replace(/"/g, '""') + '"').join(",")).join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8;" }));
+      a.download = filename;
+      a.click();
     }
 
     async function createCompany(name) {
-      const data = await api("/api/companies", {
-        method: "POST",
-        body: JSON.stringify({ name })
-      });
-
-      const companies = data.companies;
-      if (session) {
-        session.companies = companies;
-        saveSession(session);
-      } else if (pendingAccount) {
-        pendingAccount.companies = companies;
-        session = { ...pendingAccount };
-      }
-
+      const data = await api("/api/companies", { method: "POST", body: JSON.stringify({ name }) });
+      if (session) session.companies = data.companies;
+      else if (pendingAccount) { pendingAccount.companies = data.companies; session = { ...pendingAccount }; }
+      saveSession(session);
       await enterCompany(data.company.id);
-      alert("公司「" + name + "」创建成功！");
+      alert("公司「" + name + "」创建成功");
     }
 
-    $("loginForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
+    $("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
       try {
         const data = await api("/api/login", {
           method: "POST",
-          body: JSON.stringify({
-            loginId: $("loginId").value.trim().toLowerCase(),
-            password: $("password").value
-          })
+          body: JSON.stringify({ loginId: $("loginId").value.trim().toLowerCase(), password: $("password").value })
         });
-
         saveToken(data.token);
         pendingAccount = data.account;
-        session = {
-          loginId: data.account.loginId,
-          name: data.account.name,
-          companies: data.account.companies
-        };
-
-        if (data.account.companies.length === 1) {
-          await enterCompany(data.account.companies[0].id);
-        } else {
-          showCompanyPage(data.account.companies);
-        }
-      } catch (error) {
-        $("loginError").textContent = error.message;
+        session = { loginId: data.account.loginId, name: data.account.name, companies: data.account.companies };
+        if (data.account.companies.length === 1) await enterCompany(data.account.companies[0].id);
+        else showCompanyPage(data.account.companies);
+      } catch (err) {
+        $("loginError").textContent = err.message;
         $("loginError").classList.remove("hidden");
       }
     });
 
-    $("backToLoginButton").addEventListener("click", logout);
-    $("logoutButton").addEventListener("click", logout);
-    $("settingsButton").addEventListener("click", () => switchTab("settings"));
-
-    document.querySelectorAll(".tab-button").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (btn.dataset.tab === "settings") {
-          const isAdmin = currentCompany.employees.find((e) => e.employeeId === session.employeeId && e.role === "admin");
-          if (!isAdmin) { alert("只有管理员可以进入系统设置。"); return; }
-        }
-        switchTab(btn.dataset.tab);
-      });
-    });
-
     $("companySelect").addEventListener("change", async () => {
-      const companyId = $("companySelect").value;
-      if (companyId === session.companyId) return;
-      session.companyId = companyId;
-      await loadCompany(companyId);
+      session.companyId = $("companySelect").value;
+      await loadCompany(session.companyId);
       renderCompanySelect();
       renderBankTabs();
+      updateBankInfo();
       await refreshRecords();
-      renderSettings();
-      const isAdmin = currentCompany.employees.find((e) => e.employeeId === session.employeeId && e.role === "admin");
-      $("settingsButton").classList.toggle("hidden", !isAdmin);
-      $("settingsTabButton").classList.toggle("hidden", !isAdmin);
+      $("adminSection").classList.toggle("hidden", !isAdmin());
     });
 
-    $("recordForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!currentBank) { alert("请先添加银行。"); return; }
+    document.querySelectorAll('input[name="txType"]').forEach((el) => {
+      el.addEventListener("change", updateAmountLabel);
+    });
+    ["amount", "credit", "rate", "bonus"].forEach((id) => {
+      $(id).addEventListener("input", updateTotal);
+    });
 
-      const inAmount = Number($("inAmount").value || 0);
-      const outAmount = Number($("outAmount").value || 0);
-      if (inAmount === 0 && outAmount === 0) { alert("In 和 Out 至少填写一项。"); return; }
-
+    $("recordForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentBank) return alert("请先选择银行");
+      const type = getTxType();
+      const amount = Number($("amount").value || 0);
       await api("/api/companies/" + session.companyId + "/records", {
         method: "POST",
         body: JSON.stringify({
           bank: currentBank,
+          type,
           time: $("time").value,
           ref: $("ref").value.trim(),
-          inAmount,
-          outAmount
+          inAmount: type === "In" ? amount : 0,
+          outAmount: type === "Out" ? amount : 0,
+          amount,
+          category: $("category").value,
+          kiosk: $("kiosk").value,
+          sid: $("sid").value.trim(),
+          pid: $("pid").value.trim(),
+          credit: Number($("credit").value || 0),
+          rate: Number($("rate").value || 0),
+          bonus: Number($("bonus").value || 0),
+          bonusPercent: Number($("bonusPercent").value || 0),
+          tips: Number($("tips").value || 0),
+          remark: $("remark").value.trim(),
+          bc: $("bc").value.trim(),
+          transactionDate: $("transactionDate").value
         })
       });
-
       $("ref").value = "";
-      $("inAmount").value = "";
-      $("outAmount").value = "";
-      setNowAsDefaultTime();
+      $("amount").value = "";
+      $("sid").value = "";
+      $("pid").value = "";
+      $("credit").value = "";
+      $("rate").value = "";
+      $("bonus").value = "";
+      $("bonusPercent").value = "";
+      $("tips").value = "";
+      $("remark").value = "";
+      $("bc").value = "";
+      $("total").value = "";
+      setToday();
       await refreshRecords();
     });
 
-    $("recordList").addEventListener("click", async (event) => {
-      if (!event.target.classList.contains("delete-record")) return;
-      await api("/api/companies/" + session.companyId + "/records/" + event.target.dataset.id, { method: "DELETE" });
-      await refreshRecords();
+    $("searchInput").addEventListener("input", applyFilter);
+    $("filterButton").addEventListener("click", applyFilter);
+    $("menuButton").addEventListener("click", openDrawer);
+    $("closeDrawerButton").addEventListener("click", closeDrawer);
+    $("drawerOverlay").addEventListener("click", closeDrawer);
+    $("logoutButton").addEventListener("click", showLogin);
+    $("backToLoginButton").addEventListener("click", showLogin);
+
+    $("createCompanyOpenButton").addEventListener("click", () => $("createCompanyForm").classList.remove("hidden"));
+    $("createCompanyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await createCompany($("newCompanyName").value);
+    });
+    $("createCompanySettingsForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await createCompany($("settingsCompanyName").value);
+      $("settingsCompanyName").value = "";
+      closeDrawer();
     });
 
-    $("clearBankButton").addEventListener("click", async () => {
-      if (!currentBank || !confirm("确定要删除「" + currentBank + "」的全部单据记录吗？")) return;
-      await api("/api/companies/" + session.companyId + "/records/bank/" + encodeURIComponent(currentBank), { method: "DELETE" });
-      await refreshRecords();
+    $("addBankForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = await api("/api/companies/" + session.companyId + "/banks", {
+        method: "POST",
+        body: JSON.stringify({ bankName: $("newBankName").value.trim(), accountNo: $("newBankAccountNo").value.trim() })
+      });
+      currentCompany = data.company;
+      $("addBankForm").reset();
+      renderBankTabs();
+      renderDrawerSettings();
     });
 
-    $("exportBankButton").addEventListener("click", () => {
-      const rows = [["公司", "银行", "员工号", "员工姓名", "时间", "Ref", "In", "Out"]];
-      currentRecords.forEach((r) => rows.push([currentCompany.name, currentBank, session.employeeId, session.name, formatDateTime(r.time), r.ref, r.inAmount, r.outAmount]));
-      if (!currentRecords.length) rows.push([currentCompany.name, currentBank, session.employeeId, session.name, "", "", 0, 0]);
-      downloadCsv(currentCompany.name + "_" + currentBank + "_账目.csv", rows);
-    });
-
-    $("exportAllButton").addEventListener("click", async () => {
-      const data = await api("/api/companies/" + session.companyId + "/records/all");
-      const rows = [["公司", "银行", "员工号", "员工姓名", "时间", "Ref", "In", "Out"]];
-      data.records.forEach((r) => rows.push([currentCompany.name, r.bank, session.employeeId, session.name, formatDateTime(r.time), r.ref, r.inAmount, r.outAmount]));
-      if (!data.records.length) rows.push([currentCompany.name, "", session.employeeId, session.name, "", "", 0, 0]);
-      downloadCsv(currentCompany.name + "_全部账目.csv", rows);
-    });
-
-    $("addEmployeeForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
+    $("addEmployeeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
       const data = await api("/api/companies/" + session.companyId + "/employees", {
         method: "POST",
         body: JSON.stringify({
@@ -721,26 +780,12 @@
       });
       currentCompany = data.company;
       $("addEmployeeForm").reset();
-      renderSettings();
-      alert("员工添加成功。请在下方为其创建登入账号。");
+      renderDrawerSettings();
     });
 
-    $("addBankForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const data = await api("/api/companies/" + session.companyId + "/banks", {
-        method: "POST",
-        body: JSON.stringify({ bankName: $("newBankName").value.trim() })
-      });
-      currentCompany = data.company;
-      if (!currentBank) currentBank = currentCompany.banks[0];
-      $("addBankForm").reset();
-      renderBankTabs();
-      renderSettings();
-    });
-
-    $("addAccountForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const result = await api("/api/accounts", {
+    $("addAccountForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await api("/api/accounts", {
         method: "POST",
         body: JSON.stringify({
           companyId: session.companyId,
@@ -750,48 +795,33 @@
         })
       });
       $("addAccountForm").reset();
-      alert("登入账号创建成功。账号：" + result.loginId);
+      alert("登入账号创建成功");
     });
 
-    async function handleCreateCompany(name) {
-      if (!name.trim()) { alert("请输入公司名称。"); return; }
-      await createCompany(name.trim());
-    }
-
-    $("createCompanyOpenButton").addEventListener("click", () => {
-      $("createCompanyForm").classList.remove("hidden");
-    });
-    $("createCompanyCancelButton").addEventListener("click", () => {
-      $("createCompanyForm").classList.add("hidden");
-    });
-    $("createCompanyForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      await handleCreateCompany($("newCompanyName").value);
-    });
-    $("createCompanyMainButton").addEventListener("click", async () => {
-      const name = prompt("请输入新公司名称：");
-      if (name) await handleCreateCompany(name);
-    });
-    $("createCompanySettingsForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      await handleCreateCompany($("settingsCompanyName").value);
-      $("settingsCompanyName").value = "";
+    $("exportAllButton").addEventListener("click", async () => {
+      const data = await api("/api/companies/" + session.companyId + "/records/all");
+      const rows = [["Company", "Bank", "Time", "Reference", "In", "Out", "Type", "BC", "Category", "Kiosk", "SID", "PID", "Credit", "Rate", "Bonus", "Tips", "Remark", "Employee"]];
+      data.records.forEach((r) => rows.push([
+        currentCompany.name, r.bank || currentBank, formatDateTime(r.time), r.ref,
+        r.inAmount, r.outAmount, r.type, r.bc, r.category, r.kiosk, r.sid, r.pid,
+        r.credit, r.rate, r.bonus, r.tips, r.remark, r.employeeName || r.employeeId
+      ]));
+      downloadCsv(currentCompany.name + "_export.csv", rows);
     });
 
     async function init() {
       const saved = loadSession();
-      if (token && saved && saved.companyId) {
+      if (token && saved?.companyId) {
         try {
           const me = await api("/api/me");
           session = { ...saved, companies: me.companies, name: me.name, loginId: me.loginId };
           await loadCompany(saved.companyId);
-          await showMainPage();
+          currentBank = currentCompany.banks[0]?.name || null;
+          await showMain();
           return;
-        } catch (error) {
-          logout();
-        }
+        } catch { showLogin(); return; }
       }
-      showLoginPage();
+      showLogin();
     }
 
     init();

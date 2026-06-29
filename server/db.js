@@ -68,9 +68,41 @@ function initDatabase() {
     );
   `);
 
+  migrateDatabase();
+
   const count = db.prepare("SELECT COUNT(*) AS total FROM companies").get().total;
   if (count === 0) {
     seedDatabase();
+  }
+}
+
+function migrateDatabase() {
+  const recordCols = db.prepare("PRAGMA table_info(records)").all().map((col) => col.name);
+  const recordAdditions = [
+    ["type", "TEXT DEFAULT 'In'"],
+    ["bc", "TEXT DEFAULT ''"],
+    ["category", "TEXT DEFAULT ''"],
+    ["kiosk", "TEXT DEFAULT ''"],
+    ["sid", "TEXT DEFAULT ''"],
+    ["pid", "TEXT DEFAULT ''"],
+    ["credit", "REAL DEFAULT 0"],
+    ["rate", "REAL DEFAULT 0"],
+    ["bonus", "REAL DEFAULT 0"],
+    ["bonus_percent", "REAL DEFAULT 0"],
+    ["tips", "REAL DEFAULT 0"],
+    ["remark", "TEXT DEFAULT ''"],
+    ["transaction_date", "TEXT DEFAULT ''"]
+  ];
+
+  recordAdditions.forEach(([column, definition]) => {
+    if (!recordCols.includes(column)) {
+      db.exec("ALTER TABLE records ADD COLUMN " + column + " " + definition);
+    }
+  });
+
+  const bankCols = db.prepare("PRAGMA table_info(banks)").all().map((col) => col.name);
+  if (!bankCols.includes("account_no")) {
+    db.exec("ALTER TABLE banks ADD COLUMN account_no TEXT DEFAULT ''");
   }
 }
 
@@ -89,12 +121,16 @@ function verifyPassword(password, hash) {
 
 function seedDatabase() {
   const now = new Date().toISOString();
-  const defaultBanks = [
-    "中国银行",
-    "工商银行",
-    "建设银行",
-    "招商银行",
-    "农业银行"
+  const c001Banks = [
+    { name: "HQ (arrange EXP)", accountNo: "123" },
+    { name: "WinFaPay", accountNo: "201" },
+    { name: "WePay", accountNo: "202" },
+    { name: "Onepay", accountNo: "203" },
+    { name: "KIRAPay", accountNo: "204" },
+    { name: "BANK TEAM LAIN", accountNo: "205" },
+    { name: "1MPay", accountNo: "206" },
+    { name: "HQ (accrual/prepayment)", accountNo: "207" },
+    { name: "Novapay", accountNo: "208" }
   ];
 
   const insertCompany = db.prepare(
@@ -104,7 +140,7 @@ function seedDatabase() {
     "INSERT INTO employees (company_id, employee_id, name, role) VALUES (?, ?, ?, ?)"
   );
   const insertBank = db.prepare(
-    "INSERT INTO banks (company_id, bank_name) VALUES (?, ?)"
+    "INSERT INTO banks (company_id, bank_name, account_no) VALUES (?, ?, ?)"
   );
   const insertAccount = db.prepare(
     "INSERT INTO accounts (login_id, password_hash, name, default_employee_id) VALUES (?, ?, ?, ?)"
@@ -114,7 +150,7 @@ function seedDatabase() {
   );
 
   const seed = db.transaction(() => {
-    insertCompany.run("C001", "华东贸易有限公司", now);
+    insertCompany.run("C001", "GSWB", now);
     insertCompany.run("C002", "南方科技有限公司", now);
 
     insertEmployee.run("C001", "EMP001", "张三", "admin");
@@ -122,8 +158,12 @@ function seedDatabase() {
     insertEmployee.run("C001", "EMP003", "王五", "user");
     insertEmployee.run("C002", "EMP001", "张三", "admin");
 
-    defaultBanks.forEach((bank) => insertBank.run("C001", bank));
-    ["中国银行", "工商银行", "建设银行"].forEach((bank) => insertBank.run("C002", bank));
+    c001Banks.forEach((bank) => insertBank.run("C001", bank.name, bank.accountNo));
+    [
+      { name: "中国银行", accountNo: "301" },
+      { name: "工商银行", accountNo: "302" },
+      { name: "建设银行", accountNo: "303" }
+    ].forEach((bank) => insertBank.run("C002", bank.name, bank.accountNo));
 
     const adminHash = hashPassword("123456");
     const lisiHash = hashPassword("123456");
@@ -181,8 +221,8 @@ function getCompanyDetails(companyId) {
   ).all(companyId);
 
   const banks = db.prepare(
-    "SELECT bank_name AS name FROM banks WHERE company_id = ? ORDER BY bank_name"
-  ).all(companyId).map((row) => row.name);
+    "SELECT bank_name AS name, account_no AS accountNo FROM banks WHERE company_id = ? ORDER BY rowid"
+  ).all(companyId);
 
   return {
     id: company.id,
@@ -192,10 +232,29 @@ function getCompanyDetails(companyId) {
   };
 }
 
+function getBankInfo(companyId, bankName) {
+  return db.prepare(
+    "SELECT bank_name AS name, account_no AS accountNo FROM banks WHERE company_id = ? AND bank_name = ?"
+  ).get(companyId, bankName);
+}
+
+function getBankBalance(companyId, bankName) {
+  const row = db.prepare(`
+    SELECT COALESCE(SUM(in_amount), 0) - COALESCE(SUM(out_amount), 0) AS balance
+    FROM records
+    WHERE company_id = ? AND bank_name = ?
+  `).get(companyId, bankName);
+  return row ? row.balance : 0;
+}
+
 function createCompany({ name, creatorLoginId, creatorName, creatorEmployeeId }) {
   const companyId = generateCompanyId();
   const now = new Date().toISOString();
-  const defaultBanks = ["中国银行", "工商银行", "建设银行"];
+  const defaultBanks = [
+    { name: "HQ (arrange EXP)", accountNo: "101" },
+    { name: "WinFaPay", accountNo: "102" },
+    { name: "WePay", accountNo: "103" }
+  ];
 
   const tx = db.transaction(() => {
     db.prepare("INSERT INTO companies (id, name, created_at) VALUES (?, ?, ?)").run(
@@ -209,7 +268,11 @@ function createCompany({ name, creatorLoginId, creatorName, creatorEmployeeId })
     ).run(companyId, creatorEmployeeId, creatorName, "admin");
 
     defaultBanks.forEach((bank) => {
-      db.prepare("INSERT INTO banks (company_id, bank_name) VALUES (?, ?)").run(companyId, bank);
+      db.prepare("INSERT INTO banks (company_id, bank_name, account_no) VALUES (?, ?, ?)").run(
+        companyId,
+        bank.name,
+        bank.accountNo
+      );
     });
 
     const existing = db.prepare(
@@ -239,37 +302,116 @@ function removeEmployee(companyId, employeeId) {
   ).run(companyId, employeeId);
 }
 
-function addBank(companyId, bankName) {
-  db.prepare("INSERT INTO banks (company_id, bank_name) VALUES (?, ?)").run(companyId, bankName);
+function addBank(companyId, bankName, accountNo) {
+  db.prepare("INSERT INTO banks (company_id, bank_name, account_no) VALUES (?, ?, ?)").run(
+    companyId,
+    bankName,
+    accountNo || ""
+  );
 }
 
 function removeBank(companyId, bankName) {
   db.prepare("DELETE FROM banks WHERE company_id = ? AND bank_name = ?").run(companyId, bankName);
 }
 
-function getRecords(companyId, employeeId, bankName) {
-  return db.prepare(`
-    SELECT id, time, ref, in_amount AS inAmount, out_amount AS outAmount
-    FROM records
-    WHERE company_id = ? AND employee_id = ? AND bank_name = ?
-    ORDER BY time DESC, id DESC
-  `).all(companyId, employeeId, bankName);
+function mapRecordRow(row) {
+  return {
+    id: row.id,
+    time: row.time,
+    ref: row.ref,
+    inAmount: row.inAmount,
+    outAmount: row.outAmount,
+    type: row.type,
+    bc: row.bc,
+    category: row.category,
+    kiosk: row.kiosk,
+    sid: row.sid,
+    pid: row.pid,
+    credit: row.credit,
+    rate: row.rate,
+    bonus: row.bonus,
+    bonusPercent: row.bonusPercent,
+    tips: row.tips,
+    remark: row.remark,
+    transactionDate: row.transactionDate,
+    employeeId: row.employeeId,
+    employeeName: row.employeeName
+  };
 }
 
-function getAllRecordsForEmployee(companyId, employeeId) {
-  return db.prepare(`
-    SELECT id, bank_name AS bank, time, ref, in_amount AS inAmount, out_amount AS outAmount
-    FROM records
-    WHERE company_id = ? AND employee_id = ?
-    ORDER BY time DESC, id DESC
-  `).all(companyId, employeeId);
+function getRecords(companyId, bankName) {
+  const rows = db.prepare(`
+    SELECT
+      r.id,
+      r.time,
+      r.ref,
+      r.in_amount AS inAmount,
+      r.out_amount AS outAmount,
+      r.type,
+      r.bc,
+      r.category,
+      r.kiosk,
+      r.sid,
+      r.pid,
+      r.credit,
+      r.rate,
+      r.bonus,
+      r.bonus_percent AS bonusPercent,
+      r.tips,
+      r.remark,
+      r.transaction_date AS transactionDate,
+      r.employee_id AS employeeId,
+      e.name AS employeeName
+    FROM records r
+    LEFT JOIN employees e ON e.company_id = r.company_id AND e.employee_id = r.employee_id
+    WHERE r.company_id = ? AND r.bank_name = ?
+    ORDER BY r.time DESC, r.id DESC
+  `).all(companyId, bankName);
+
+  return rows.map(mapRecordRow);
+}
+
+function getAllRecordsForCompany(companyId) {
+  const rows = db.prepare(`
+    SELECT
+      r.id,
+      r.bank_name AS bank,
+      r.time,
+      r.ref,
+      r.in_amount AS inAmount,
+      r.out_amount AS outAmount,
+      r.type,
+      r.bc,
+      r.category,
+      r.kiosk,
+      r.sid,
+      r.pid,
+      r.credit,
+      r.rate,
+      r.bonus,
+      r.bonus_percent AS bonusPercent,
+      r.tips,
+      r.remark,
+      r.transaction_date AS transactionDate,
+      r.employee_id AS employeeId,
+      e.name AS employeeName
+    FROM records r
+    LEFT JOIN employees e ON e.company_id = r.company_id AND e.employee_id = r.employee_id
+    WHERE r.company_id = ?
+    ORDER BY r.time DESC, r.id DESC
+  `).all(companyId);
+
+  return rows.map(mapRecordRow);
 }
 
 function addRecord(companyId, employeeId, bankName, record) {
   const now = new Date().toISOString();
   const result = db.prepare(`
-    INSERT INTO records (company_id, employee_id, bank_name, time, ref, in_amount, out_amount, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO records (
+      company_id, employee_id, bank_name, time, ref, in_amount, out_amount,
+      type, bc, category, kiosk, sid, pid, credit, rate, bonus, bonus_percent,
+      tips, remark, transaction_date, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     companyId,
     employeeId,
@@ -278,28 +420,62 @@ function addRecord(companyId, employeeId, bankName, record) {
     record.ref,
     record.inAmount,
     record.outAmount,
+    record.type || "In",
+    record.bc || "",
+    record.category || "",
+    record.kiosk || "",
+    record.sid || "",
+    record.pid || "",
+    record.credit || 0,
+    record.rate || 0,
+    record.bonus || 0,
+    record.bonusPercent || 0,
+    record.tips || 0,
+    record.remark || "",
+    record.transactionDate || "",
     now
   );
 
-  return {
-    id: result.lastInsertRowid,
-    time: record.time,
-    ref: record.ref,
-    inAmount: record.inAmount,
-    outAmount: record.outAmount
-  };
+  const rows = db.prepare(`
+    SELECT
+      r.id,
+      r.time,
+      r.ref,
+      r.in_amount AS inAmount,
+      r.out_amount AS outAmount,
+      r.type,
+      r.bc,
+      r.category,
+      r.kiosk,
+      r.sid,
+      r.pid,
+      r.credit,
+      r.rate,
+      r.bonus,
+      r.bonus_percent AS bonusPercent,
+      r.tips,
+      r.remark,
+      r.transaction_date AS transactionDate,
+      r.employee_id AS employeeId,
+      e.name AS employeeName
+    FROM records r
+    LEFT JOIN employees e ON e.company_id = r.company_id AND e.employee_id = r.employee_id
+    WHERE r.id = ?
+  `).get(result.lastInsertRowid);
+
+  return mapRecordRow(rows);
 }
 
-function deleteRecord(companyId, recordId, employeeId) {
+function deleteRecord(companyId, recordId) {
   return db.prepare(
-    "DELETE FROM records WHERE id = ? AND company_id = ? AND employee_id = ?"
-  ).run(recordId, companyId, employeeId).changes > 0;
+    "DELETE FROM records WHERE id = ? AND company_id = ?"
+  ).run(recordId, companyId).changes > 0;
 }
 
-function clearBankRecords(companyId, employeeId, bankName) {
+function clearBankRecords(companyId, bankName) {
   db.prepare(
-    "DELETE FROM records WHERE company_id = ? AND employee_id = ? AND bank_name = ?"
-  ).run(companyId, employeeId, bankName);
+    "DELETE FROM records WHERE company_id = ? AND bank_name = ?"
+  ).run(companyId, bankName);
 }
 
 function createAccount({ loginId, password, name, employeeId, companyId }) {
@@ -328,8 +504,10 @@ module.exports = {
   removeEmployee,
   addBank,
   removeBank,
+  getBankInfo,
+  getBankBalance,
   getRecords,
-  getAllRecordsForEmployee,
+  getAllRecordsForCompany,
   addRecord,
   deleteRecord,
   clearBankRecords,

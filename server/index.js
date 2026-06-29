@@ -172,16 +172,18 @@ app.delete("/api/companies/:companyId/employees/:employeeId", authMiddleware, re
 
 app.post("/api/companies/:companyId/banks", authMiddleware, requireCompanyAccess, requireAdmin, (req, res) => {
   const bankName = String(req.body.bankName || "").trim();
+  const accountNo = String(req.body.accountNo || "").trim();
+
   if (!bankName) {
     return res.status(400).json({ error: "请输入银行名称。" });
   }
 
   const company = db.getCompanyDetails(req.params.companyId);
-  if (company.banks.includes(bankName)) {
+  if (company.banks.some((bank) => bank.name === bankName)) {
     return res.status(400).json({ error: "该银行已存在。" });
   }
 
-  db.addBank(req.params.companyId, bankName);
+  db.addBank(req.params.companyId, bankName, accountNo);
   res.status(201).json({ company: db.getCompanyDetails(req.params.companyId) });
 });
 
@@ -196,26 +198,27 @@ app.delete("/api/companies/:companyId/banks/:bankName", authMiddleware, requireC
 });
 
 app.get("/api/companies/:companyId/records", authMiddleware, requireCompanyAccess, (req, res) => {
-  const access = db.getAccountCompanies(req.user.loginId).find(
-    (item) => item.id === req.params.companyId
-  );
-  const employeeId = access.employeeId;
   const bankName = String(req.query.bank || "");
 
   if (!bankName) {
     return res.status(400).json({ error: "请指定银行。" });
   }
 
-  res.json({ records: db.getRecords(req.params.companyId, employeeId, bankName) });
+  const bank = db.getBankInfo(req.params.companyId, bankName);
+  if (!bank) {
+    return res.status(404).json({ error: "银行不存在。" });
+  }
+
+  res.json({
+    bank,
+    balance: db.getBankBalance(req.params.companyId, bankName),
+    records: db.getRecords(req.params.companyId, bankName)
+  });
 });
 
 app.get("/api/companies/:companyId/records/all", authMiddleware, requireCompanyAccess, (req, res) => {
-  const access = db.getAccountCompanies(req.user.loginId).find(
-    (item) => item.id === req.params.companyId
-  );
-
   res.json({
-    records: db.getAllRecordsForEmployee(req.params.companyId, access.employeeId)
+    records: db.getAllRecordsForCompany(req.params.companyId)
   });
 });
 
@@ -224,8 +227,9 @@ app.post("/api/companies/:companyId/records", authMiddleware, requireCompanyAcce
     (item) => item.id === req.params.companyId
   );
   const bankName = String(req.body.bank || "").trim();
-  const inAmount = Number(req.body.inAmount || 0);
-  const outAmount = Number(req.body.outAmount || 0);
+  const type = req.body.type === "Out" ? "Out" : "In";
+  const inAmount = type === "In" ? Number(req.body.inAmount || req.body.amount || 0) : 0;
+  const outAmount = type === "Out" ? Number(req.body.outAmount || req.body.amount || 0) : 0;
 
   if (!bankName) {
     return res.status(400).json({ error: "请选择银行。" });
@@ -239,22 +243,30 @@ app.post("/api/companies/:companyId/records", authMiddleware, requireCompanyAcce
     time: String(req.body.time || ""),
     ref: String(req.body.ref || "").trim(),
     inAmount,
-    outAmount
+    outAmount,
+    type,
+    bc: String(req.body.bc || "").trim(),
+    category: String(req.body.category || "").trim(),
+    kiosk: String(req.body.kiosk || "").trim(),
+    sid: String(req.body.sid || "").trim(),
+    pid: String(req.body.pid || "").trim(),
+    credit: Number(req.body.credit || 0),
+    rate: Number(req.body.rate || 0),
+    bonus: Number(req.body.bonus || 0),
+    bonusPercent: Number(req.body.bonusPercent || 0),
+    tips: Number(req.body.tips || 0),
+    remark: String(req.body.remark || "").trim(),
+    transactionDate: String(req.body.transactionDate || "").trim()
   });
 
-  res.status(201).json({ record });
+  res.status(201).json({
+    record,
+    balance: db.getBankBalance(req.params.companyId, bankName)
+  });
 });
 
 app.delete("/api/companies/:companyId/records/:recordId", authMiddleware, requireCompanyAccess, (req, res) => {
-  const access = db.getAccountCompanies(req.user.loginId).find(
-    (item) => item.id === req.params.companyId
-  );
-
-  const deleted = db.deleteRecord(
-    req.params.companyId,
-    Number(req.params.recordId),
-    access.employeeId
-  );
+  const deleted = db.deleteRecord(req.params.companyId, Number(req.params.recordId));
 
   if (!deleted) {
     return res.status(404).json({ error: "记录不存在。" });
@@ -264,16 +276,15 @@ app.delete("/api/companies/:companyId/records/:recordId", authMiddleware, requir
 });
 
 app.delete("/api/companies/:companyId/records/bank/:bankName", authMiddleware, requireCompanyAccess, (req, res) => {
-  const access = db.getAccountCompanies(req.user.loginId).find(
-    (item) => item.id === req.params.companyId
-  );
+  const bankName = decodeURIComponent(req.params.bankName);
+  const employeeId = getUserEmployeeId(req.user.loginId, req.params.companyId);
+  const employee = employeeId ? db.getEmployee(req.params.companyId, employeeId) : null;
 
-  db.clearBankRecords(
-    req.params.companyId,
-    access.employeeId,
-    decodeURIComponent(req.params.bankName)
-  );
+  if (!employee || employee.role !== "admin") {
+    return res.status(403).json({ error: "只有管理员可以清空银行记录。" });
+  }
 
+  db.clearBankRecords(req.params.companyId, bankName);
   res.json({ success: true });
 });
 
