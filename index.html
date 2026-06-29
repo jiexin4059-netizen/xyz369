@@ -48,6 +48,30 @@
       box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
     }
 
+    .login-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .employee-badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: #1e3a8a;
+      background: #dbeafe;
+      font-weight: 700;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -119,6 +143,10 @@
     .danger-button {
       color: #fff;
       background: #dc2626;
+    }
+
+    .hidden {
+      display: none;
     }
 
     .summary {
@@ -198,6 +226,7 @@
     }
 
     @media (max-width: 900px) {
+      .login-grid,
       .form-grid,
       .summary {
         grid-template-columns: repeat(2, 1fr);
@@ -214,6 +243,7 @@
         padding: 18px;
       }
 
+      .login-grid,
       .form-grid,
       .summary {
         grid-template-columns: 1fr;
@@ -229,61 +259,96 @@
   <main class="page">
     <header class="header">
       <h1>公司账目管理系统</h1>
-      <p>记录每日收入和支出，数据会自动保存在当前浏览器中。</p>
+      <p>员工用自己的员工号登入后，按不同银行记录每日 In 和 Out。</p>
     </header>
 
-    <section class="card">
+    <section id="loginSection" class="card">
+      <form id="loginForm">
+        <div class="login-grid">
+          <div class="form-field">
+            <label for="employeeNumber">员工号</label>
+            <input type="text" id="employeeNumber" placeholder="例如：EMP001" autocomplete="username" required>
+          </div>
+          <button type="submit" class="primary-button">登入账户</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="appSection" class="hidden">
+      <div class="toolbar">
+        <div class="employee-badge">当前员工号：<span id="currentEmployeeNumber"></span></div>
+        <button type="button" id="logoutButton" class="secondary-button">登出</button>
+      </div>
+
+      <section class="card">
       <form id="accountForm">
         <div class="form-grid">
+          <div class="form-field">
+            <label for="bank">银行</label>
+            <select id="bank" required>
+              <option value="">请选择银行</option>
+              <option value="Maybank">Maybank</option>
+              <option value="Public Bank">Public Bank</option>
+              <option value="CIMB Bank">CIMB Bank</option>
+              <option value="Hong Leong Bank">Hong Leong Bank</option>
+              <option value="RHB Bank">RHB Bank</option>
+              <option value="Bank Islam">Bank Islam</option>
+              <option value="其他银行">其他银行</option>
+            </select>
+          </div>
+
           <div class="form-field">
             <label for="date">日期</label>
             <input type="date" id="date" required>
           </div>
 
           <div class="form-field">
-            <label for="summary">摘要</label>
-            <input type="text" id="summary" placeholder="例如：办公用品" required>
+            <label for="ref">Ref</label>
+            <input type="text" id="ref" placeholder="例如：INV-001" required>
           </div>
 
           <div class="form-field">
-            <label for="category">类别</label>
-            <select id="category" required>
-              <option value="">请选择类别</option>
-              <option value="销售收入">销售收入</option>
-              <option value="服务收入">服务收入</option>
-              <option value="办公支出">办公支出</option>
-              <option value="工资支出">工资支出</option>
-              <option value="差旅支出">差旅支出</option>
-              <option value="其他">其他</option>
-            </select>
+            <label for="inAmount">In（收）</label>
+            <input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00">
           </div>
 
           <div class="form-field">
-            <label for="income">收入</label>
-            <input type="number" id="income" min="0" step="0.01" placeholder="0.00">
-          </div>
-
-          <div class="form-field">
-            <label for="expense">支出</label>
-            <input type="number" id="expense" min="0" step="0.01" placeholder="0.00">
+            <label for="outAmount">Out（出）</label>
+            <input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00">
           </div>
         </div>
 
         <div class="button-row">
           <button type="submit" class="primary-button">添加记录</button>
           <button type="reset" class="secondary-button">清空输入</button>
-          <button type="button" id="clearAllButton" class="danger-button">删除全部记录</button>
+          <button type="button" id="clearAllButton" class="danger-button">删除当前员工记录</button>
         </div>
       </form>
     </section>
 
+    <section class="card">
+      <div class="form-field">
+        <label for="bankFilter">查看银行</label>
+        <select id="bankFilter">
+          <option value="all">全部银行</option>
+          <option value="Maybank">Maybank</option>
+          <option value="Public Bank">Public Bank</option>
+          <option value="CIMB Bank">CIMB Bank</option>
+          <option value="Hong Leong Bank">Hong Leong Bank</option>
+          <option value="RHB Bank">RHB Bank</option>
+          <option value="Bank Islam">Bank Islam</option>
+          <option value="其他银行">其他银行</option>
+        </select>
+      </div>
+    </section>
+
     <section class="summary" aria-label="账目汇总">
       <div class="summary-item">
-        <span>总收入</span>
+        <span>总 In（收）</span>
         <strong id="totalIncome" class="income">¥0.00</strong>
       </div>
       <div class="summary-item">
-        <span>总支出</span>
+        <span>总 Out（出）</span>
         <strong id="totalExpense" class="expense">¥0.00</strong>
       </div>
       <div class="summary-item">
@@ -297,11 +362,12 @@
         <table>
           <thead>
             <tr>
+              <th>银行</th>
               <th>日期</th>
-              <th>摘要</th>
-              <th>类别</th>
-              <th>收入</th>
-              <th>支出</th>
+              <th>Ref</th>
+              <th>In（收）</th>
+              <th>Out（出）</th>
+              <th>员工号</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -309,17 +375,26 @@
         </table>
       </div>
     </section>
+    </section>
   </main>
 
   <script>
     const STORAGE_KEY = "companyAccountRecords";
+    const SESSION_KEY = "companyAccountEmployee";
 
+    const loginSection = document.getElementById("loginSection");
+    const appSection = document.getElementById("appSection");
+    const loginForm = document.getElementById("loginForm");
+    const employeeNumberInput = document.getElementById("employeeNumber");
+    const currentEmployeeNumber = document.getElementById("currentEmployeeNumber");
+    const logoutButton = document.getElementById("logoutButton");
     const form = document.getElementById("accountForm");
+    const bankInput = document.getElementById("bank");
+    const bankFilter = document.getElementById("bankFilter");
     const dateInput = document.getElementById("date");
-    const summaryInput = document.getElementById("summary");
-    const categoryInput = document.getElementById("category");
-    const incomeInput = document.getElementById("income");
-    const expenseInput = document.getElementById("expense");
+    const refInput = document.getElementById("ref");
+    const inAmountInput = document.getElementById("inAmount");
+    const outAmountInput = document.getElementById("outAmount");
     const recordList = document.getElementById("recordList");
     const totalIncome = document.getElementById("totalIncome");
     const totalExpense = document.getElementById("totalExpense");
@@ -327,6 +402,7 @@
     const clearAllButton = document.getElementById("clearAllButton");
 
     let records = loadRecords();
+    let activeEmployeeNumber = sessionStorage.getItem(SESSION_KEY) || "";
 
     function loadRecords() {
       const savedRecords = localStorage.getItem(STORAGE_KEY);
@@ -353,23 +429,51 @@
       dateInput.value = new Date().toISOString().slice(0, 10);
     }
 
+    function showLogin() {
+      activeEmployeeNumber = "";
+      sessionStorage.removeItem(SESSION_KEY);
+      loginSection.classList.remove("hidden");
+      appSection.classList.add("hidden");
+      employeeNumberInput.focus();
+    }
+
+    function showApp(employeeNumber) {
+      activeEmployeeNumber = employeeNumber;
+      sessionStorage.setItem(SESSION_KEY, employeeNumber);
+      currentEmployeeNumber.textContent = employeeNumber;
+      loginSection.classList.add("hidden");
+      appSection.classList.remove("hidden");
+      setTodayAsDefaultDate();
+      renderRecords();
+    }
+
+    function getVisibleRecords() {
+      return records.filter(function (record) {
+        const isCurrentEmployee = record.employeeNumber === activeEmployeeNumber;
+        const isSelectedBank = bankFilter.value === "all" || record.bank === bankFilter.value;
+        return isCurrentEmployee && isSelectedBank;
+      });
+    }
+
     function renderRecords() {
+      const visibleRecords = getVisibleRecords();
       recordList.innerHTML = "";
 
-      if (records.length === 0) {
-        recordList.innerHTML = '<tr><td class="empty" colspan="6">暂无记录，请先添加一条账目。</td></tr>';
-        updateSummary();
+      if (visibleRecords.length === 0) {
+        recordList.innerHTML = '<tr><td class="empty" colspan="7">暂无记录，请先添加一条银行单据。</td></tr>';
+        updateSummary(visibleRecords);
         return;
       }
 
-      records.forEach((record, index) => {
+      visibleRecords.forEach((record) => {
         const row = document.createElement("tr");
         const values = [
+          record.bank,
           record.date,
-          record.summary,
-          record.category,
-          formatMoney(record.income),
-          formatMoney(record.expense)
+          record.ref,
+          formatMoney(record.inAmount),
+          formatMoney(record.outAmount),
+          record.employeeNumber
         ];
 
         values.forEach((value, cellIndex) => {
@@ -391,7 +495,7 @@
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
         deleteButton.className = "danger-button delete-record";
-        deleteButton.dataset.index = index;
+        deleteButton.dataset.id = record.id;
         deleteButton.textContent = "删除";
         actionCell.appendChild(deleteButton);
         row.appendChild(actionCell);
@@ -399,12 +503,12 @@
         recordList.appendChild(row);
       });
 
-      updateSummary();
+      updateSummary(visibleRecords);
     }
 
-    function updateSummary() {
-      const incomeSum = records.reduce((sum, record) => sum + record.income, 0);
-      const expenseSum = records.reduce((sum, record) => sum + record.expense, 0);
+    function updateSummary(visibleRecords) {
+      const incomeSum = visibleRecords.reduce((sum, record) => sum + record.inAmount, 0);
+      const expenseSum = visibleRecords.reduce((sum, record) => sum + record.outAmount, 0);
       const balanceSum = incomeSum - expenseSum;
 
       totalIncome.textContent = formatMoney(incomeSum);
@@ -412,23 +516,40 @@
       balance.textContent = formatMoney(balanceSum);
     }
 
+    loginForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const employeeNumber = employeeNumberInput.value.trim().toUpperCase();
+      if (!employeeNumber) {
+        alert("请输入员工号。");
+        return;
+      }
+
+      showApp(employeeNumber);
+      loginForm.reset();
+    });
+
+    logoutButton.addEventListener("click", showLogin);
+
     form.addEventListener("submit", function (event) {
       event.preventDefault();
 
-      const income = Number(incomeInput.value || 0);
-      const expense = Number(expenseInput.value || 0);
+      const inAmount = Number(inAmountInput.value || 0);
+      const outAmount = Number(outAmountInput.value || 0);
 
-      if (income === 0 && expense === 0) {
-        alert("收入和支出至少填写一项。");
+      if (inAmount === 0 && outAmount === 0) {
+        alert("In（收）和 Out（出）至少填写一项。");
         return;
       }
 
       const record = {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        employeeNumber: activeEmployeeNumber,
+        bank: bankInput.value,
         date: dateInput.value,
-        summary: summaryInput.value.trim(),
-        category: categoryInput.value,
-        income,
-        expense
+        ref: refInput.value.trim(),
+        inAmount,
+        outAmount
       };
 
       records.unshift(record);
@@ -438,29 +559,39 @@
       setTodayAsDefaultDate();
     });
 
+    bankFilter.addEventListener("change", renderRecords);
+
     recordList.addEventListener("click", function (event) {
       if (!event.target.classList.contains("delete-record")) {
         return;
       }
 
-      const index = Number(event.target.dataset.index);
+      const recordId = event.target.dataset.id;
+      const index = records.findIndex((record) => record.id === recordId);
+      if (index === -1) {
+        return;
+      }
+
       records.splice(index, 1);
       saveRecords();
       renderRecords();
     });
 
     clearAllButton.addEventListener("click", function () {
-      if (!confirm("确定要删除全部账目记录吗？")) {
+      if (!confirm("确定要删除当前员工的全部账目记录吗？")) {
         return;
       }
 
-      records = [];
+      records = records.filter((record) => record.employeeNumber !== activeEmployeeNumber);
       saveRecords();
       renderRecords();
     });
 
-    setTodayAsDefaultDate();
-    renderRecords();
+    if (activeEmployeeNumber) {
+      showApp(activeEmployeeNumber);
+    } else {
+      showLogin();
+    }
   </script>
 </body>
 </html>
