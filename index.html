@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>公司账目管理系统</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,25 +21,11 @@
       padding: 40px 0;
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
-    .header {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    .header h1 {
-      margin: 0 0 8px;
-      font-size: 32px;
-      color: #0f172a;
-    }
-
-    .header p {
-      margin: 0;
-      color: #64748b;
-    }
+    .header { margin-bottom: 24px; text-align: center; }
+    .header h1 { margin: 0 0 8px; font-size: 32px; color: #0f172a; }
+    .header p { margin: 0; color: #64748b; }
 
     .card {
       margin-bottom: 24px;
@@ -53,17 +37,18 @@
     }
 
     .login-card {
-      width: min(420px, calc(100% - 32px));
-      margin: 80px auto;
+      width: min(460px, calc(100% - 32px));
+      margin: 60px auto;
     }
 
-    .login-card h2 {
+    .login-card h2, .section-title {
       margin: 0 0 8px;
-      text-align: center;
       color: #0f172a;
     }
 
-    .login-card .subtitle {
+    .login-card h2 { text-align: center; }
+
+    .subtitle {
       margin: 0 0 24px;
       text-align: center;
       color: #64748b;
@@ -77,13 +62,11 @@
       margin-bottom: 16px;
     }
 
-    label {
-      font-weight: 700;
-      color: #334155;
-    }
+    .form-field.compact { margin-bottom: 0; }
 
-    input,
-    select {
+    label { font-weight: 700; color: #334155; }
+
+    input, select {
       width: 100%;
       padding: 12px 14px;
       border: 1px solid #cbd5e1;
@@ -94,8 +77,7 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
@@ -103,6 +85,13 @@
     .form-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       align-items: end;
     }
@@ -129,24 +118,11 @@
       box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
     }
 
-    .primary-button {
-      color: #fff;
-      background: #2563eb;
-    }
-
-    .secondary-button {
-      color: #334155;
-      background: #e2e8f0;
-    }
-
-    .danger-button {
-      color: #fff;
-      background: #dc2626;
-    }
-
-    .full-width-button {
-      width: 100%;
-    }
+    .primary-button { color: #fff; background: #2563eb; }
+    .secondary-button { color: #334155; background: #e2e8f0; }
+    .danger-button { color: #fff; background: #dc2626; }
+    .success-button { color: #fff; background: #16a34a; }
+    .full-width-button { width: 100%; }
 
     .top-bar {
       display: flex;
@@ -154,6 +130,12 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -165,14 +147,20 @@
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
     }
 
-    .user-info strong {
-      color: #0f172a;
+    .user-info strong { color: #0f172a; }
+    .user-info span { color: #64748b; font-size: 14px; }
+
+    .company-switcher {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .user-info span {
-      color: #64748b;
-      font-size: 14px;
-    }
+    .company-switcher label { margin: 0; white-space: nowrap; }
+
+    .company-switcher select { max-width: 280px; }
 
     .bank-tabs {
       display: flex;
@@ -192,10 +180,7 @@
       transition: all 0.2s;
     }
 
-    .bank-tab:hover {
-      border-color: #2563eb;
-      color: #2563eb;
-    }
+    .bank-tab:hover { border-color: #2563eb; color: #2563eb; }
 
     .bank-tab.active {
       background: #2563eb;
@@ -204,11 +189,7 @@
       box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
     }
 
-    .bank-title {
-      margin: 0 0 16px;
-      font-size: 20px;
-      color: #0f172a;
-    }
+    .bank-title { margin: 0 0 16px; font-size: 20px; color: #0f172a; }
 
     .summary {
       display: grid;
@@ -232,25 +213,13 @@
       font-size: 14px;
     }
 
-    .summary-item strong {
-      font-size: 24px;
-    }
+    .summary-item strong { font-size: 24px; }
 
-    .income {
-      color: #16a34a;
-    }
+    .income { color: #16a34a; }
+    .expense { color: #dc2626; }
+    .balance { color: #2563eb; }
 
-    .expense {
-      color: #dc2626;
-    }
-
-    .balance {
-      color: #2563eb;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
+    .table-wrap { overflow-x: auto; }
 
     table {
       width: 100%;
@@ -258,8 +227,7 @@
       min-width: 680px;
     }
 
-    th,
-    td {
+    th, td {
       padding: 14px 12px;
       border-bottom: 1px solid #e2e8f0;
       text-align: left;
@@ -271,9 +239,7 @@
       font-size: 14px;
     }
 
-    tbody tr:hover {
-      background: #f8fafc;
-    }
+    tbody tr:hover { background: #f8fafc; }
 
     .empty {
       padding: 28px 12px;
@@ -281,7 +247,7 @@
       color: #94a3b8;
     }
 
-    .delete-record {
+    .delete-record, .small-button {
       padding: 8px 12px;
       font-size: 13px;
     }
@@ -314,32 +280,115 @@
       font-size: 14px;
     }
 
+    .company-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .company-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .company-option:hover {
+      border-color: #2563eb;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+    }
+
+    .company-option strong { display: block; color: #0f172a; }
+    .company-option span { color: #64748b; font-size: 14px; }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .settings-panel {
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    .settings-panel h3 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 13px;
+    }
+
+    .tag button {
+      padding: 0 4px;
+      background: transparent;
+      color: #64748b;
+      font-size: 14px;
+      box-shadow: none;
+    }
+
+    .tag button:hover {
+      transform: none;
+      color: #dc2626;
+      box-shadow: none;
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tab-button.active {
+      background: #2563eb;
+      color: #fff;
+    }
+
     @media (max-width: 900px) {
-      .form-grid,
-      .summary {
+      .form-grid, .form-grid-3, .summary, .settings-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 620px) {
-      .page {
-        width: min(100% - 20px, 1100px);
-        padding: 24px 0;
-      }
-
-      .card,
-      .login-card {
-        padding: 18px;
-      }
-
-      .form-grid,
-      .summary {
+      .page { width: min(100% - 20px, 1100px); padding: 24px 0; }
+      .card, .login-card { padding: 18px; }
+      .form-grid, .form-grid-3, .summary, .settings-grid {
         grid-template-columns: 1fr;
       }
-
-      .header h1 {
-        font-size: 26px;
-      }
+      .header h1 { font-size: 26px; }
     }
   </style>
 </head>
@@ -347,29 +396,35 @@
   <!-- 登录页面 -->
   <section id="loginPage" class="login-card card">
     <h2>公司账目管理系统</h2>
-    <p class="subtitle">请使用员工号登录</p>
-
+    <p class="subtitle">使用登入账号和密码，可访问多个公司</p>
     <div id="loginError" class="error-message hidden"></div>
-
     <form id="loginForm">
       <div class="form-field">
-        <label for="employeeId">员工号</label>
-        <input type="text" id="employeeId" placeholder="例如：EMP001" required autocomplete="username">
+        <label for="loginId">登入账号</label>
+        <input type="text" id="loginId" placeholder="例如：admin" required autocomplete="username">
       </div>
-
       <div class="form-field">
         <label for="password">密码</label>
         <input type="password" id="password" placeholder="请输入密码" required autocomplete="current-password">
       </div>
-
       <button type="submit" class="primary-button full-width-button">登入</button>
     </form>
-
     <div class="login-hint">
-      <strong>演示账号（仅供测试）：</strong><br>
-      员工号 <code>EMP001</code>，密码 <code>123456</code>（张三）<br>
-      员工号 <code>EMP002</code>，密码 <code>123456</code>（李四）<br>
-      员工号 <code>EMP003</code>，密码 <code>123456</code>（王五）
+      <strong>演示账号：</strong><br>
+      登入账号 <code>admin</code>，密码 <code>123456</code><br>
+      可访问「华东贸易」和「南方科技」两家公司<br><br>
+      登入账号 <code>lisi</code>，密码 <code>123456</code><br>
+      只能访问「华东贸易」
+    </div>
+  </section>
+
+  <!-- 选择公司页面 -->
+  <section id="companyPage" class="login-card card hidden">
+    <h2>选择公司</h2>
+    <p class="subtitle">你的账号可访问以下公司，请选择要进入的公司</p>
+    <div id="companyList" class="company-list"></div>
+    <div class="button-row">
+      <button type="button" id="backToLoginButton" class="secondary-button">返回登入</button>
     </div>
   </section>
 
@@ -378,112 +433,228 @@
     <div class="top-bar">
       <div class="user-info">
         <strong id="userName">员工</strong><br>
-        <span>员工号：<span id="userEmployeeId"></span></span>
+        <span>登入账号：<span id="userLoginId"></span> · 员工号：<span id="userEmployeeId"></span></span>
       </div>
-      <button type="button" id="logoutButton" class="secondary-button">退出登入</button>
+      <div class="top-actions">
+        <button type="button" id="settingsButton" class="secondary-button hidden">系统设置</button>
+        <button type="button" id="logoutButton" class="secondary-button">退出登入</button>
+      </div>
     </div>
 
-    <header class="header">
-      <h1>公司账目管理系统</h1>
-      <p>选择银行后，录入该银行的单据记录</p>
-    </header>
+    <div class="company-switcher">
+      <label for="companySelect">当前公司</label>
+      <select id="companySelect"></select>
+    </div>
 
-    <nav class="bank-tabs" id="bankTabs" aria-label="银行选择"></nav>
+    <nav class="tabs-nav" aria-label="主功能">
+      <button type="button" class="tab-button active" data-tab="records">单据录入</button>
+      <button type="button" class="tab-button" data-tab="settings" id="settingsTabButton">系统设置</button>
+    </nav>
 
-    <section class="card">
-      <h2 class="bank-title" id="currentBankTitle">当前银行</h2>
+    <!-- 单据录入 -->
+    <div id="recordsTab">
+      <header class="header">
+        <h1>单据录入</h1>
+        <p>选择银行后，录入该银行的单据记录</p>
+      </header>
 
-      <form id="recordForm">
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="time">时间</label>
-            <input type="datetime-local" id="time" required>
+      <nav class="bank-tabs" id="bankTabs" aria-label="银行选择"></nav>
+
+      <section class="card">
+        <h2 class="bank-title" id="currentBankTitle">当前银行</h2>
+        <form id="recordForm">
+          <div class="form-grid">
+            <div class="form-field compact">
+              <label for="time">时间</label>
+              <input type="datetime-local" id="time" required>
+            </div>
+            <div class="form-field compact">
+              <label for="ref">Ref（参考号）</label>
+              <input type="text" id="ref" placeholder="例如：TXN20240629001" required>
+            </div>
+            <div class="form-field compact">
+              <label for="inAmount">In（收入）</label>
+              <input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-field compact">
+              <label for="outAmount">Out（支出）</label>
+              <input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div class="button-row">
+            <button type="submit" class="primary-button">添加单据</button>
+            <button type="reset" class="secondary-button">清空输入</button>
+            <button type="button" id="exportBankButton" class="success-button">导出本银行 Excel</button>
+            <button type="button" id="exportAllButton" class="success-button">导出本公司全部 Excel</button>
+            <button type="button" id="clearBankButton" class="danger-button">删除本银行全部记录</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="summary" aria-label="当前银行汇总">
+        <div class="summary-item">
+          <span>总收入 (In)</span>
+          <strong id="totalIn" class="income">¥0.00</strong>
+        </div>
+        <div class="summary-item">
+          <span>总支出 (Out)</span>
+          <strong id="totalOut" class="expense">¥0.00</strong>
+        </div>
+        <div class="summary-item">
+          <span>结余</span>
+          <strong id="balance" class="balance">¥0.00</strong>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>Ref</th>
+                <th>In（收入）</th>
+                <th>Out（支出）</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordList"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- 系统设置 -->
+    <div id="settingsTab" class="hidden">
+      <header class="header">
+        <h1>系统设置</h1>
+        <p>管理当前公司的员工和银行（仅管理员可见）</p>
+      </header>
+
+      <section class="card">
+        <div class="settings-grid">
+          <div class="settings-panel">
+            <h3>添加员工</h3>
+            <form id="addEmployeeForm">
+              <div class="form-field">
+                <label for="newEmployeeId">员工号</label>
+                <input type="text" id="newEmployeeId" placeholder="例如：EMP004" required>
+              </div>
+              <div class="form-field">
+                <label for="newEmployeeName">姓名</label>
+                <input type="text" id="newEmployeeName" placeholder="例如：赵六" required>
+              </div>
+              <div class="form-field">
+                <label for="newEmployeeRole">角色</label>
+                <select id="newEmployeeRole">
+                  <option value="user">普通员工</option>
+                  <option value="admin">管理员</option>
+                </select>
+              </div>
+              <button type="submit" class="primary-button">添加员工</button>
+            </form>
+            <div class="tag-list" id="employeeList"></div>
           </div>
 
-          <div class="form-field">
-            <label for="ref">Ref（参考号）</label>
-            <input type="text" id="ref" placeholder="例如：TXN20240629001" required>
-          </div>
-
-          <div class="form-field">
-            <label for="inAmount">In（收入）</label>
-            <input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00">
-          </div>
-
-          <div class="form-field">
-            <label for="outAmount">Out（支出）</label>
-            <input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00">
+          <div class="settings-panel">
+            <h3>添加银行</h3>
+            <form id="addBankForm">
+              <div class="form-field">
+                <label for="newBankName">银行名称</label>
+                <input type="text" id="newBankName" placeholder="例如：交通银行" required>
+              </div>
+              <button type="submit" class="primary-button">添加银行</button>
+            </form>
+            <div class="tag-list" id="bankList"></div>
           </div>
         </div>
+      </section>
 
-        <div class="button-row">
-          <button type="submit" class="primary-button">添加单据</button>
-          <button type="reset" class="secondary-button">清空输入</button>
-          <button type="button" id="clearBankButton" class="danger-button">删除本银行全部记录</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="summary" aria-label="当前银行汇总">
-      <div class="summary-item">
-        <span>总收入 (In)</span>
-        <strong id="totalIn" class="income">¥0.00</strong>
-      </div>
-      <div class="summary-item">
-        <span>总支出 (Out)</span>
-        <strong id="totalOut" class="expense">¥0.00</strong>
-      </div>
-      <div class="summary-item">
-        <span>结余</span>
-        <strong id="balance" class="balance">¥0.00</strong>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>时间</th>
-              <th>Ref</th>
-              <th>In（收入）</th>
-              <th>Out（支出）</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="recordList"></tbody>
-        </table>
-      </div>
-    </section>
+      <section class="card">
+        <h2 class="section-title">添加登入账号（可访问多个公司）</h2>
+        <p class="subtitle" style="text-align:left;margin-bottom:16px;">为新员工创建登入账号，同一账号密码可访问你被授权的公司</p>
+        <form id="addAccountForm">
+          <div class="form-grid-3">
+            <div class="form-field compact">
+              <label for="newLoginId">登入账号</label>
+              <input type="text" id="newLoginId" placeholder="例如：zhaoliu" required>
+            </div>
+            <div class="form-field compact">
+              <label for="newLoginPassword">密码</label>
+              <input type="password" id="newLoginPassword" placeholder="设置密码" required>
+            </div>
+            <div class="form-field compact">
+              <label for="newLoginEmployeeId">对应员工号</label>
+              <input type="text" id="newLoginEmployeeId" placeholder="例如：EMP004" required>
+            </div>
+          </div>
+          <div class="button-row">
+            <button type="submit" class="primary-button">创建登入账号</button>
+          </div>
+        </form>
+      </section>
+    </div>
   </main>
 
   <script>
-    const STORAGE_KEY = "companyAccountData";
-    const SESSION_KEY = "companyAccountSession";
+    const STORAGE_KEY = "companyAccountDataV2";
+    const SESSION_KEY = "companyAccountSessionV2";
 
-    const BANKS = [
-      "中国银行",
-      "工商银行",
-      "建设银行",
-      "招商银行",
-      "农业银行"
-    ];
-
-    const EMPLOYEES = {
-      EMP001: { name: "张三", password: "123456" },
-      EMP002: { name: "李四", password: "123456" },
-      EMP003: { name: "王五", password: "123456" }
+    const DEFAULT_SYSTEM = {
+      version: 2,
+      companies: {
+        C001: {
+          id: "C001",
+          name: "华东贸易有限公司",
+          banks: ["中国银行", "工商银行", "建设银行", "招商银行", "农业银行"],
+          employees: {
+            EMP001: { name: "张三", role: "admin" },
+            EMP002: { name: "李四", role: "user" },
+            EMP003: { name: "王五", role: "user" }
+          }
+        },
+        C002: {
+          id: "C002",
+          name: "南方科技有限公司",
+          banks: ["中国银行", "工商银行", "建设银行"],
+          employees: {
+            EMP001: { name: "张三", role: "admin" }
+          }
+        }
+      },
+      accounts: {
+        admin: {
+          password: "123456",
+          name: "张三",
+          companies: ["C001", "C002"],
+          employeeId: "EMP001"
+        },
+        lisi: {
+          password: "123456",
+          name: "李四",
+          companies: ["C001"],
+          employeeId: "EMP002"
+        }
+      },
+      records: {}
     };
 
     const loginPage = document.getElementById("loginPage");
+    const companyPage = document.getElementById("companyPage");
     const mainPage = document.getElementById("mainPage");
     const loginForm = document.getElementById("loginForm");
     const loginError = document.getElementById("loginError");
-    const employeeIdInput = document.getElementById("employeeId");
+    const loginIdInput = document.getElementById("loginId");
     const passwordInput = document.getElementById("password");
+    const companyList = document.getElementById("companyList");
+    const backToLoginButton = document.getElementById("backToLoginButton");
     const logoutButton = document.getElementById("logoutButton");
+    const settingsButton = document.getElementById("settingsButton");
+    const settingsTabButton = document.getElementById("settingsTabButton");
     const userName = document.getElementById("userName");
+    const userLoginId = document.getElementById("userLoginId");
     const userEmployeeId = document.getElementById("userEmployeeId");
+    const companySelect = document.getElementById("companySelect");
     const bankTabs = document.getElementById("bankTabs");
     const currentBankTitle = document.getElementById("currentBankTitle");
     const recordForm = document.getElementById("recordForm");
@@ -496,26 +667,40 @@
     const totalOut = document.getElementById("totalOut");
     const balance = document.getElementById("balance");
     const clearBankButton = document.getElementById("clearBankButton");
+    const exportBankButton = document.getElementById("exportBankButton");
+    const exportAllButton = document.getElementById("exportAllButton");
+    const recordsTab = document.getElementById("recordsTab");
+    const settingsTab = document.getElementById("settingsTab");
+    const addEmployeeForm = document.getElementById("addEmployeeForm");
+    const addBankForm = document.getElementById("addBankForm");
+    const addAccountForm = document.getElementById("addAccountForm");
+    const employeeList = document.getElementById("employeeList");
+    const bankList = document.getElementById("bankList");
 
-    let currentUser = null;
-    let currentBank = BANKS[0];
-    let allData = loadAllData();
+    let system = loadSystem();
+    let session = null;
+    let currentBank = null;
 
-    function loadAllData() {
+    function loadSystem() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) {
-        return {};
+        return JSON.parse(JSON.stringify(DEFAULT_SYSTEM));
       }
 
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.version === 2) {
+          return parsed;
+        }
       } catch (error) {
-        return {};
+        return JSON.parse(JSON.stringify(DEFAULT_SYSTEM));
       }
+
+      return JSON.parse(JSON.stringify(DEFAULT_SYSTEM));
     }
 
-    function saveAllData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+    function saveSystem() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(system));
     }
 
     function loadSession() {
@@ -531,32 +716,60 @@
       }
     }
 
-    function saveSession(user) {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    function saveSession(value) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(value));
     }
 
     function clearSession() {
       sessionStorage.removeItem(SESSION_KEY);
     }
 
-    function getUserRecords() {
-      if (!currentUser) {
-        return [];
+    function getCurrentCompany() {
+      if (!session || !session.companyId) {
+        return null;
+      }
+      return system.companies[session.companyId] || null;
+    }
+
+    function getCurrentEmployee() {
+      const company = getCurrentCompany();
+      if (!company || !session) {
+        return null;
+      }
+      return company.employees[session.employeeId] || null;
+    }
+
+    function isAdmin() {
+      const employee = getCurrentEmployee();
+      return employee && employee.role === "admin";
+    }
+
+    function getCompanyBanks() {
+      const company = getCurrentCompany();
+      return company ? company.banks : [];
+    }
+
+    function ensureRecordsPath() {
+      const companyId = session.companyId;
+      const employeeId = session.employeeId;
+
+      if (!system.records[companyId]) {
+        system.records[companyId] = {};
       }
 
-      if (!allData[currentUser.employeeId]) {
-        allData[currentUser.employeeId] = {};
+      if (!system.records[companyId][employeeId]) {
+        system.records[companyId][employeeId] = {};
       }
 
-      if (!allData[currentUser.employeeId][currentBank]) {
-        allData[currentUser.employeeId][currentBank] = [];
+      if (!system.records[companyId][employeeId][currentBank]) {
+        system.records[companyId][employeeId][currentBank] = [];
       }
 
-      return allData[currentUser.employeeId][currentBank];
+      return system.records[companyId][employeeId][currentBank];
     }
 
     function formatMoney(amount) {
-      return `¥${Number(amount).toFixed(2)}`;
+      return "¥" + Number(amount).toFixed(2);
     }
 
     function formatDateTime(value) {
@@ -571,7 +784,7 @@
       const hours = String(date.getHours()).padStart(2, "0");
       const minutes = String(date.getMinutes()).padStart(2, "0");
 
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
+      return year + "-" + month + "-" + day + " " + hours + ":" + minutes;
     }
 
     function setNowAsDefaultTime() {
@@ -590,27 +803,115 @@
       loginError.classList.add("hidden");
     }
 
-    function showLoginPage() {
-      loginPage.classList.remove("hidden");
+    function hideAllPages() {
+      loginPage.classList.add("hidden");
+      companyPage.classList.add("hidden");
       mainPage.classList.add("hidden");
+    }
+
+    function showLoginPage() {
+      hideAllPages();
+      loginPage.classList.remove("hidden");
       hideLoginError();
       loginForm.reset();
+      session = null;
+      clearSession();
+    }
+
+    function showCompanyPage(account) {
+      hideAllPages();
+      companyPage.classList.remove("hidden");
+      companyList.innerHTML = "";
+
+      account.companies.forEach(function (companyId) {
+        const company = system.companies[companyId];
+        if (!company) {
+          return;
+        }
+
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "company-option";
+        option.innerHTML = "<div><strong>" + company.name + "</strong><span>公司编号：" + company.id + "</span></div><span>进入 →</span>";
+        option.addEventListener("click", function () {
+          enterCompany(account, companyId);
+        });
+        companyList.appendChild(option);
+      });
+    }
+
+    function enterCompany(account, companyId) {
+      const company = system.companies[companyId];
+      if (!company || !company.employees[account.employeeId]) {
+        alert("你在该公司没有员工档案，请联系管理员。");
+        return;
+      }
+
+      session = {
+        loginId: account.loginId,
+        name: account.name,
+        employeeId: account.employeeId,
+        companyId: companyId,
+        companies: account.companies.slice()
+      };
+
+      const banks = getCompanyBanks();
+      currentBank = banks[0] || null;
+      saveSession(session);
+      showMainPage();
     }
 
     function showMainPage() {
-      loginPage.classList.add("hidden");
+      hideAllPages();
       mainPage.classList.remove("hidden");
-      userName.textContent = currentUser.name;
-      userEmployeeId.textContent = currentUser.employeeId;
+
+      userName.textContent = session.name;
+      userLoginId.textContent = session.loginId;
+      userEmployeeId.textContent = session.employeeId;
+
+      renderCompanySelect();
       renderBankTabs();
       renderRecords();
+      renderSettings();
       setNowAsDefaultTime();
+      switchTab("records");
+
+      const admin = isAdmin();
+      settingsButton.classList.toggle("hidden", !admin);
+      settingsTabButton.classList.toggle("hidden", !admin);
+    }
+
+    function renderCompanySelect() {
+      companySelect.innerHTML = "";
+
+      session.companies.forEach(function (companyId) {
+        const company = system.companies[companyId];
+        if (!company) {
+          return;
+        }
+
+        const option = document.createElement("option");
+        option.value = companyId;
+        option.textContent = company.name;
+        option.selected = companyId === session.companyId;
+        companySelect.appendChild(option);
+      });
     }
 
     function renderBankTabs() {
       bankTabs.innerHTML = "";
+      const banks = getCompanyBanks();
 
-      BANKS.forEach(function (bank) {
+      if (banks.length === 0) {
+        currentBankTitle.textContent = "请先添加银行";
+        return;
+      }
+
+      if (!currentBank || !banks.includes(currentBank)) {
+        currentBank = banks[0];
+      }
+
+      banks.forEach(function (bank) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "bank-tab" + (bank === currentBank ? " active" : "");
@@ -628,8 +929,15 @@
     }
 
     function renderRecords() {
-      const records = getUserRecords();
       recordList.innerHTML = "";
+
+      if (!currentBank) {
+        recordList.innerHTML = '<tr><td class="empty" colspan="5">请先在系统设置中添加银行。</td></tr>';
+        updateSummary();
+        return;
+      }
+
+      const records = ensureRecordsPath();
 
       if (records.length === 0) {
         recordList.innerHTML = '<tr><td class="empty" colspan="5">暂无单据，请先添加一条记录。</td></tr>';
@@ -639,7 +947,6 @@
 
       records.forEach(function (record, index) {
         const row = document.createElement("tr");
-
         const cells = [
           formatDateTime(record.time),
           record.ref,
@@ -650,15 +957,8 @@
         cells.forEach(function (value, cellIndex) {
           const cell = document.createElement("td");
           cell.textContent = value;
-
-          if (cellIndex === 2) {
-            cell.className = "income";
-          }
-
-          if (cellIndex === 3) {
-            cell.className = "expense";
-          }
-
+          if (cellIndex === 2) cell.className = "income";
+          if (cellIndex === 3) cell.className = "expense";
           row.appendChild(cell);
         });
 
@@ -670,7 +970,6 @@
         deleteButton.textContent = "删除";
         actionCell.appendChild(deleteButton);
         row.appendChild(actionCell);
-
         recordList.appendChild(row);
       });
 
@@ -678,7 +977,14 @@
     }
 
     function updateSummary() {
-      const records = getUserRecords();
+      if (!currentBank) {
+        totalIn.textContent = formatMoney(0);
+        totalOut.textContent = formatMoney(0);
+        balance.textContent = formatMoney(0);
+        return;
+      }
+
+      const records = ensureRecordsPath();
       const inSum = records.reduce(function (sum, record) {
         return sum + record.inAmount;
       }, 0);
@@ -691,35 +997,227 @@
       balance.textContent = formatMoney(inSum - outSum);
     }
 
+    function renderSettings() {
+      if (!isAdmin()) {
+        return;
+      }
+
+      const company = getCurrentCompany();
+      employeeList.innerHTML = "";
+      bankList.innerHTML = "";
+
+      Object.keys(company.employees).forEach(function (employeeId) {
+        const employee = company.employees[employeeId];
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.innerHTML = employeeId + " " + employee.name + " (" + (employee.role === "admin" ? "管理员" : "员工") + ")";
+        if (employeeId !== session.employeeId) {
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.textContent = "×";
+          removeButton.title = "删除员工";
+          removeButton.addEventListener("click", function () {
+            if (!confirm("确定删除员工 " + employee.name + " 吗？")) {
+              return;
+            }
+            delete company.employees[employeeId];
+            saveSystem();
+            renderSettings();
+          });
+          tag.appendChild(removeButton);
+        }
+        employeeList.appendChild(tag);
+      });
+
+      company.banks.forEach(function (bank) {
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = bank;
+        if (company.banks.length > 1) {
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.textContent = "×";
+          removeButton.title = "删除银行";
+          removeButton.addEventListener("click", function () {
+            if (!confirm("确定删除银行「" + bank + "」吗？相关记录也会保留但无法再访问。")) {
+              return;
+            }
+            company.banks = company.banks.filter(function (item) {
+              return item !== bank;
+            });
+            if (currentBank === bank) {
+              currentBank = company.banks[0] || null;
+            }
+            saveSystem();
+            renderBankTabs();
+            renderRecords();
+            renderSettings();
+          });
+          tag.appendChild(removeButton);
+        }
+        bankList.appendChild(tag);
+      });
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-button").forEach(function (button) {
+        button.classList.toggle("active", button.dataset.tab === tabName);
+      });
+
+      recordsTab.classList.toggle("hidden", tabName !== "records");
+      settingsTab.classList.toggle("hidden", tabName !== "settings");
+
+      if (tabName === "settings") {
+        renderSettings();
+      }
+    }
+
+    function downloadCsv(filename, rows) {
+      const csvContent = "\uFEFF" + rows.map(function (row) {
+        return row.map(function (cell) {
+          const value = String(cell == null ? "" : cell).replace(/"/g, '""');
+          return '"' + value + '"';
+        }).join(",");
+      }).join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function exportBankToExcel() {
+      if (!currentBank) {
+        alert("请先选择银行。");
+        return;
+      }
+
+      const company = getCurrentCompany();
+      const records = ensureRecordsPath();
+      const rows = [
+        ["公司", "银行", "员工号", "员工姓名", "时间", "Ref", "In", "Out"]
+      ];
+
+      records.forEach(function (record) {
+        rows.push([
+          company.name,
+          currentBank,
+          session.employeeId,
+          session.name,
+          formatDateTime(record.time),
+          record.ref,
+          record.inAmount,
+          record.outAmount
+        ]);
+      });
+
+      if (records.length === 0) {
+        rows.push([company.name, currentBank, session.employeeId, session.name, "", "", 0, 0]);
+      }
+
+      downloadCsv(company.name + "_" + currentBank + "_账目.csv", rows);
+    }
+
+    function exportAllToExcel() {
+      const company = getCurrentCompany();
+      const rows = [
+        ["公司", "银行", "员工号", "员工姓名", "时间", "Ref", "In", "Out"]
+      ];
+
+      const employeeRecords = system.records[session.companyId] &&
+        system.records[session.companyId][session.employeeId]
+        ? system.records[session.companyId][session.employeeId]
+        : {};
+
+      company.banks.forEach(function (bank) {
+        const records = employeeRecords[bank] || [];
+        records.forEach(function (record) {
+          rows.push([
+            company.name,
+            bank,
+            session.employeeId,
+            session.name,
+            formatDateTime(record.time),
+            record.ref,
+            record.inAmount,
+            record.outAmount
+          ]);
+        });
+      });
+
+      if (rows.length === 1) {
+        rows.push([company.name, "", session.employeeId, session.name, "", "", 0, 0]);
+      }
+
+      downloadCsv(company.name + "_全部账目.csv", rows);
+    }
+
     loginForm.addEventListener("submit", function (event) {
       event.preventDefault();
       hideLoginError();
 
-      const employeeId = employeeIdInput.value.trim().toUpperCase();
+      const loginId = loginIdInput.value.trim().toLowerCase();
       const password = passwordInput.value;
-      const employee = EMPLOYEES[employeeId];
+      const account = system.accounts[loginId];
 
-      if (!employee) {
-        showLoginError("员工号不存在，请检查后重试。");
+      if (!account) {
+        showLoginError("登入账号不存在，请检查后重试。");
         return;
       }
 
-      if (employee.password !== password) {
+      if (account.password !== password) {
         showLoginError("密码错误，请重试。");
         return;
       }
 
-      currentUser = {
-        employeeId: employeeId,
-        name: employee.name
+      const accountInfo = {
+        loginId: loginId,
+        name: account.name,
+        employeeId: account.employeeId,
+        companies: account.companies.slice()
       };
 
-      saveSession(currentUser);
-      showMainPage();
+      if (accountInfo.companies.length === 1) {
+        enterCompany(accountInfo, accountInfo.companies[0]);
+        return;
+      }
+
+      session = { pendingAccount: accountInfo };
+      showCompanyPage(accountInfo);
+    });
+
+    backToLoginButton.addEventListener("click", showLoginPage);
+
+    companySelect.addEventListener("change", function () {
+      const companyId = companySelect.value;
+      if (companyId === session.companyId) {
+        return;
+      }
+
+      const company = system.companies[companyId];
+      if (!company.employees[session.employeeId]) {
+        alert("你在该公司没有员工档案，无法切换。");
+        companySelect.value = session.companyId;
+        return;
+      }
+
+      session.companyId = companyId;
+      currentBank = company.banks[0] || null;
+      saveSession(session);
+      renderBankTabs();
+      renderRecords();
+      renderSettings();
     });
 
     recordForm.addEventListener("submit", function (event) {
       event.preventDefault();
+
+      if (!currentBank) {
+        alert("请先在系统设置中添加银行。");
+        return;
+      }
 
       const inAmount = Number(inAmountInput.value || 0);
       const outAmount = Number(outAmountInput.value || 0);
@@ -729,18 +1227,16 @@
         return;
       }
 
-      const record = {
+      const records = ensureRecordsPath();
+      records.unshift({
         time: timeInput.value,
         ref: refInput.value.trim(),
         inAmount: inAmount,
         outAmount: outAmount
-      };
+      });
 
-      const records = getUserRecords();
-      records.unshift(record);
-      saveAllData();
+      saveSystem();
       renderRecords();
-
       refInput.value = "";
       inAmountInput.value = "";
       outAmountInput.value = "";
@@ -753,31 +1249,145 @@
       }
 
       const index = Number(event.target.dataset.index);
-      const records = getUserRecords();
+      const records = ensureRecordsPath();
       records.splice(index, 1);
-      saveAllData();
+      saveSystem();
       renderRecords();
     });
 
     clearBankButton.addEventListener("click", function () {
+      if (!currentBank) {
+        return;
+      }
+
       if (!confirm("确定要删除「" + currentBank + "」的全部单据记录吗？")) {
         return;
       }
 
-      allData[currentUser.employeeId][currentBank] = [];
-      saveAllData();
+      system.records[session.companyId][session.employeeId][currentBank] = [];
+      saveSystem();
       renderRecords();
     });
 
-    logoutButton.addEventListener("click", function () {
-      currentUser = null;
-      clearSession();
-      showLoginPage();
+    exportBankButton.addEventListener("click", exportBankToExcel);
+    exportAllButton.addEventListener("click", exportAllToExcel);
+
+    logoutButton.addEventListener("click", showLoginPage);
+    settingsButton.addEventListener("click", function () {
+      switchTab("settings");
+    });
+
+    document.querySelectorAll(".tab-button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (button.dataset.tab === "settings" && !isAdmin()) {
+          alert("只有管理员可以进入系统设置。");
+          return;
+        }
+        switchTab(button.dataset.tab);
+      });
+    });
+
+    addEmployeeForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!isAdmin()) {
+        alert("只有管理员可以添加员工。");
+        return;
+      }
+
+      const company = getCurrentCompany();
+      const employeeId = document.getElementById("newEmployeeId").value.trim().toUpperCase();
+      const employeeName = document.getElementById("newEmployeeName").value.trim();
+      const role = document.getElementById("newEmployeeRole").value;
+
+      if (company.employees[employeeId]) {
+        alert("该员工号已存在。");
+        return;
+      }
+
+      company.employees[employeeId] = {
+        name: employeeName,
+        role: role
+      };
+
+      saveSystem();
+      addEmployeeForm.reset();
+      renderSettings();
+      alert("员工添加成功。如需该员工登入，请在下方创建登入账号。");
+    });
+
+    addBankForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!isAdmin()) {
+        alert("只有管理员可以添加银行。");
+        return;
+      }
+
+      const company = getCurrentCompany();
+      const bankName = document.getElementById("newBankName").value.trim();
+
+      if (!bankName) {
+        alert("请输入银行名称。");
+        return;
+      }
+
+      if (company.banks.includes(bankName)) {
+        alert("该银行已存在。");
+        return;
+      }
+
+      company.banks.push(bankName);
+      if (!currentBank) {
+        currentBank = bankName;
+      }
+
+      saveSystem();
+      addBankForm.reset();
+      renderBankTabs();
+      renderSettings();
+    });
+
+    addAccountForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!isAdmin()) {
+        alert("只有管理员可以创建登入账号。");
+        return;
+      }
+
+      const loginId = document.getElementById("newLoginId").value.trim().toLowerCase();
+      const loginPassword = document.getElementById("newLoginPassword").value;
+      const employeeId = document.getElementById("newLoginEmployeeId").value.trim().toUpperCase();
+      const company = getCurrentCompany();
+
+      if (system.accounts[loginId]) {
+        alert("该登入账号已存在。");
+        return;
+      }
+
+      if (!company.employees[employeeId]) {
+        alert("请先在上方添加该员工号。");
+        return;
+      }
+
+      system.accounts[loginId] = {
+        password: loginPassword,
+        name: company.employees[employeeId].name,
+        companies: [session.companyId],
+        employeeId: employeeId
+      };
+
+      saveSystem();
+      addAccountForm.reset();
+      alert("登入账号创建成功。账号：" + loginId);
     });
 
     const savedSession = loadSession();
-    if (savedSession && EMPLOYEES[savedSession.employeeId]) {
-      currentUser = savedSession;
+    if (savedSession && savedSession.loginId && system.accounts[savedSession.loginId]) {
+      session = savedSession;
+      const banks = getCompanyBanks();
+      currentBank = banks[0] || null;
       showMainPage();
     } else {
       showLoginPage();
