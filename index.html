@@ -72,9 +72,52 @@
       font-weight: 700;
     }
 
+    .bank-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .bank-tab {
+      color: #334155;
+      background: #e2e8f0;
+    }
+
+    .bank-tab.active {
+      color: #fff;
+      background: #2563eb;
+    }
+
+    .bank-panel-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .bank-panel-heading span,
+    .today-note {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .bank-panel-heading h2 {
+      margin: 6px 0 0;
+      color: #0f172a;
+      font-size: 26px;
+    }
+
+    .today-note {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f1f5f9;
+    }
+
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       align-items: end;
     }
@@ -227,6 +270,7 @@
 
     @media (max-width: 900px) {
       .login-grid,
+      .bank-tabs,
       .form-grid,
       .summary {
         grid-template-columns: repeat(2, 1fr);
@@ -244,6 +288,7 @@
       }
 
       .login-grid,
+      .bank-tabs,
       .form-grid,
       .summary {
         grid-template-columns: 1fr;
@@ -259,7 +304,7 @@
   <main class="page">
     <header class="header">
       <h1>公司账目管理系统</h1>
-      <p>员工用自己的员工号登入后，按不同银行记录每日 In 和 Out。</p>
+          <p>员工登入后进入不同银行页面，按时间和 Ref 记录每日 In 和 Out。</p>
     </header>
 
     <section id="loginSection" class="card">
@@ -281,66 +326,48 @@
       </div>
 
       <section class="card">
-      <form id="accountForm">
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="bank">银行</label>
-            <select id="bank" required>
-              <option value="">请选择银行</option>
-              <option value="Maybank">Maybank</option>
-              <option value="Public Bank">Public Bank</option>
-              <option value="CIMB Bank">CIMB Bank</option>
-              <option value="Hong Leong Bank">Hong Leong Bank</option>
-              <option value="RHB Bank">RHB Bank</option>
-              <option value="Bank Islam">Bank Islam</option>
-              <option value="其他银行">其他银行</option>
-            </select>
-          </div>
+        <div id="bankTabs" class="bank-tabs" aria-label="银行页面"></div>
+      </section>
 
-          <div class="form-field">
-            <label for="date">日期</label>
-            <input type="date" id="date" required>
+      <section class="card">
+        <div class="bank-panel-heading">
+          <div>
+            <span>当前银行页面</span>
+            <h2 id="activeBankName">MBB XX</h2>
           </div>
-
-          <div class="form-field">
-            <label for="ref">Ref</label>
-            <input type="text" id="ref" placeholder="例如：INV-001" required>
-          </div>
-
-          <div class="form-field">
-            <label for="inAmount">In（收）</label>
-            <input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00">
-          </div>
-
-          <div class="form-field">
-            <label for="outAmount">Out（出）</label>
-            <input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00">
-          </div>
+          <div class="today-note">当天日期：<strong id="todayDate"></strong></div>
         </div>
 
-        <div class="button-row">
-          <button type="submit" class="primary-button">添加记录</button>
-          <button type="reset" class="secondary-button">清空输入</button>
-          <button type="button" id="clearAllButton" class="danger-button">删除当前员工记录</button>
-        </div>
-      </form>
-    </section>
+        <form id="accountForm">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="time">收款时间</label>
+              <input type="time" id="time" required>
+            </div>
 
-    <section class="card">
-      <div class="form-field">
-        <label for="bankFilter">查看银行</label>
-        <select id="bankFilter">
-          <option value="all">全部银行</option>
-          <option value="Maybank">Maybank</option>
-          <option value="Public Bank">Public Bank</option>
-          <option value="CIMB Bank">CIMB Bank</option>
-          <option value="Hong Leong Bank">Hong Leong Bank</option>
-          <option value="RHB Bank">RHB Bank</option>
-          <option value="Bank Islam">Bank Islam</option>
-          <option value="其他银行">其他银行</option>
-        </select>
-      </div>
-    </section>
+            <div class="form-field">
+              <label for="ref">Ref</label>
+              <input type="text" id="ref" placeholder="例如：INV-001" required>
+            </div>
+
+            <div class="form-field">
+              <label for="inAmount">In（收）</label>
+              <input type="number" id="inAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+
+            <div class="form-field">
+              <label for="outAmount">Out（出）</label>
+              <input type="number" id="outAmount" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button type="submit" class="primary-button">添加记录</button>
+            <button type="reset" class="secondary-button">清空输入</button>
+            <button type="button" id="clearAllButton" class="danger-button">删除本银行记录</button>
+          </div>
+        </form>
+      </section>
 
     <section class="summary" aria-label="账目汇总">
       <div class="summary-item">
@@ -362,12 +389,11 @@
         <table>
           <thead>
             <tr>
-              <th>银行</th>
               <th>日期</th>
+              <th>时间</th>
               <th>Ref</th>
               <th>In（收）</th>
               <th>Out（出）</th>
-              <th>员工号</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -381,6 +407,7 @@
   <script>
     const STORAGE_KEY = "companyAccountRecords";
     const SESSION_KEY = "companyAccountEmployee";
+    const BANKS = ["MBB XX", "PBB XX", "CIMB XX"];
 
     const loginSection = document.getElementById("loginSection");
     const appSection = document.getElementById("appSection");
@@ -389,9 +416,10 @@
     const currentEmployeeNumber = document.getElementById("currentEmployeeNumber");
     const logoutButton = document.getElementById("logoutButton");
     const form = document.getElementById("accountForm");
-    const bankInput = document.getElementById("bank");
-    const bankFilter = document.getElementById("bankFilter");
-    const dateInput = document.getElementById("date");
+    const bankTabs = document.getElementById("bankTabs");
+    const activeBankName = document.getElementById("activeBankName");
+    const todayDate = document.getElementById("todayDate");
+    const timeInput = document.getElementById("time");
     const refInput = document.getElementById("ref");
     const inAmountInput = document.getElementById("inAmount");
     const outAmountInput = document.getElementById("outAmount");
@@ -403,6 +431,7 @@
 
     let records = loadRecords();
     let activeEmployeeNumber = sessionStorage.getItem(SESSION_KEY) || "";
+    let activeBank = BANKS[0];
 
     function loadRecords() {
       const savedRecords = localStorage.getItem(STORAGE_KEY);
@@ -425,8 +454,36 @@
       return `¥${Number(amount).toFixed(2)}`;
     }
 
-    function setTodayAsDefaultDate() {
-      dateInput.value = new Date().toISOString().slice(0, 10);
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function setTodayDisplay() {
+      todayDate.textContent = getTodayDate();
+    }
+
+    function renderBankTabs() {
+      bankTabs.innerHTML = "";
+
+      BANKS.forEach(function (bank) {
+        const tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = bank === activeBank ? "bank-tab active" : "bank-tab";
+        tab.dataset.bank = bank;
+        tab.textContent = bank;
+        bankTabs.appendChild(tab);
+      });
+    }
+
+    function setActiveBank(bank) {
+      activeBank = bank;
+      activeBankName.textContent = bank;
+      renderBankTabs();
+      renderRecords();
     }
 
     function showLogin() {
@@ -441,17 +498,19 @@
       activeEmployeeNumber = employeeNumber;
       sessionStorage.setItem(SESSION_KEY, employeeNumber);
       currentEmployeeNumber.textContent = employeeNumber;
+      activeBankName.textContent = activeBank;
       loginSection.classList.add("hidden");
       appSection.classList.remove("hidden");
-      setTodayAsDefaultDate();
+      setTodayDisplay();
+      renderBankTabs();
       renderRecords();
     }
 
     function getVisibleRecords() {
       return records.filter(function (record) {
         const isCurrentEmployee = record.employeeNumber === activeEmployeeNumber;
-        const isSelectedBank = bankFilter.value === "all" || record.bank === bankFilter.value;
-        return isCurrentEmployee && isSelectedBank;
+        const isActiveBank = record.bank === activeBank;
+        return isCurrentEmployee && isActiveBank;
       });
     }
 
@@ -460,7 +519,7 @@
       recordList.innerHTML = "";
 
       if (visibleRecords.length === 0) {
-        recordList.innerHTML = '<tr><td class="empty" colspan="7">暂无记录，请先添加一条银行单据。</td></tr>';
+        recordList.innerHTML = '<tr><td class="empty" colspan="6">暂无记录，请先添加一条银行单据。</td></tr>';
         updateSummary(visibleRecords);
         return;
       }
@@ -468,12 +527,11 @@
       visibleRecords.forEach((record) => {
         const row = document.createElement("tr");
         const values = [
-          record.bank,
           record.date,
+          record.time || "-",
           record.ref,
           formatMoney(record.inAmount),
-          formatMoney(record.outAmount),
-          record.employeeNumber
+          formatMoney(record.outAmount)
         ];
 
         values.forEach((value, cellIndex) => {
@@ -545,8 +603,9 @@
       const record = {
         id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         employeeNumber: activeEmployeeNumber,
-        bank: bankInput.value,
-        date: dateInput.value,
+        bank: activeBank,
+        date: getTodayDate(),
+        time: timeInput.value,
         ref: refInput.value.trim(),
         inAmount,
         outAmount
@@ -556,10 +615,15 @@
       saveRecords();
       renderRecords();
       form.reset();
-      setTodayAsDefaultDate();
     });
 
-    bankFilter.addEventListener("change", renderRecords);
+    bankTabs.addEventListener("click", function (event) {
+      if (!event.target.classList.contains("bank-tab")) {
+        return;
+      }
+
+      setActiveBank(event.target.dataset.bank);
+    });
 
     recordList.addEventListener("click", function (event) {
       if (!event.target.classList.contains("delete-record")) {
@@ -578,11 +642,13 @@
     });
 
     clearAllButton.addEventListener("click", function () {
-      if (!confirm("确定要删除当前员工的全部账目记录吗？")) {
+      if (!confirm(`确定要删除 ${activeBank} 的全部账目记录吗？`)) {
         return;
       }
 
-      records = records.filter((record) => record.employeeNumber !== activeEmployeeNumber);
+      records = records.filter((record) => {
+        return record.employeeNumber !== activeEmployeeNumber || record.bank !== activeBank;
+      });
       saveRecords();
       renderRecords();
     });
